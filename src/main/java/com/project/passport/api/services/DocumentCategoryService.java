@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import com.project.passport.api.dto.DocumentCategoryDto;
 import com.project.passport.api.model.DocumentCategory;
 import com.project.passport.api.repository.DocumentCategoryRepository;
 
@@ -27,17 +28,23 @@ public class DocumentCategoryService {
 
     }
 
-    public DocumentCategory createDocumentCategory(DocumentCategory documentCategory) {
+    public DocumentCategory createDocumentCategory(DocumentCategoryDto dto) {
+        DocumentCategory documentCategory = new DocumentCategory();
+        documentCategory.setName(dto.getName());
+        documentCategory.setDescription(dto.getDescription());
+        documentCategory.setPermitType(dto.getPermitType());
+        documentCategory.setActive(dto.isActive());
+
         return documentCategoryRepository.save(documentCategory);
     }
 
-    public DocumentCategory updateDocumentCategory(UUID id, DocumentCategory updatedDocumentCategory) {
+    public DocumentCategory updateDocumentCategory(UUID id, DocumentCategoryDto dto) {
         DocumentCategory documentCategory = getDocumentCategoryById(id);
 
-        documentCategory.setName(updatedDocumentCategory.getName());
-        documentCategory.setDescription(updatedDocumentCategory.getDescription());
-        documentCategory.setPermitType(updatedDocumentCategory.getPermitType());
-        documentCategory.setActive(updatedDocumentCategory.isActive());
+        documentCategory.setName(dto.getName());
+        documentCategory.setDescription(dto.getDescription());
+        documentCategory.setPermitType(dto.getPermitType());
+        documentCategory.setActive(dto.isActive());
 
         return documentCategoryRepository.save(documentCategory);
     }

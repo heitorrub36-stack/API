@@ -1,48 +1,15 @@
-package com.project.passport.api.model;
+package com.project.passport.api.dto;
 
-import java.util.UUID;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-
-@Entity
-public class DocumentCategory {
-   
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+public class DocumentCategoryDto {
 
     private String name;
-
     private String description;
-
     private String permitType;
-
     private boolean active = true;
 
-
-
-    public DocumentCategory() {
+    public DocumentCategoryDto() {
     }
 
-
-    public DocumentCategory(String name, String description, String permitType) {
-        this.name = name;
-
-        this.description = description;
-
-        this.permitType = permitType;
-
-        this.active = true;
-
-    }
-
-    public UUID getId() {
-        return id;
-    }
-    
     public String getName() {
         return name;
     }
@@ -74,11 +41,4 @@ public class DocumentCategory {
     public void setActive(boolean active) {
         this.active = active;
     }
-
-
-
-
-
-
-
 }
