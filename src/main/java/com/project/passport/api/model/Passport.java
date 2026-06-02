@@ -15,6 +15,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 
 @Entity
 @Table(name = "passports")
@@ -24,11 +25,14 @@ public class Passport {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @Version
+    private Long version;
+
     @Column(nullable = false)
     private String candidateName;
 
     @Column(nullable = false)
-    private String canditeCpf;
+    private String candidateCpf;
 
     @Column(nullable = false)
     private String jobPosition;
@@ -63,6 +67,14 @@ public class Passport {
         this.id = id;
     }
 
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
+
     public String getCandidateName() {
         return candidateName;
     }
@@ -71,12 +83,12 @@ public class Passport {
         this.candidateName = candidateName;
     }
 
-    public String getCanditeCpf() {
-        return canditeCpf;
+    public String getCandidateCpf() {
+        return candidateCpf;
     }
 
-    public void setCanditeCpf(String canditeCpf) {
-        this.canditeCpf = canditeCpf;
+    public void setCandidateCpf(String candidateCpf) {
+        this.candidateCpf = candidateCpf;
     }
 
     public String getJobPosition() {
