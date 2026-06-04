@@ -3,6 +3,7 @@ package com.project.passport.api.controller;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -58,8 +59,9 @@ public class PassportController {
         return passportService.cancelPassport(id);
     }
 
-    @DeleteMapping("/{id}")
-    public void deletePassport(@PathVariable UUID id) {
-        passportService.deletePassport(id);
-    }
+  @DeleteMapping("/{id}")
+public ResponseEntity<Void> deletePassport(@PathVariable UUID id) {
+    passportService.deletePassport(id);
+    return ResponseEntity.noContent().build();
+}
 }
