@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema Passaporte - RH</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+    <h1>Sistema Passaporte</h1>
+    <nav>
+        <a href="rh.html">RH</a>
+        <a href="review.html">Médico/Gerente</a>
+        <a href="dashboard.html">Dashboard</a>
+    </nav>
+</header>
+
+<main class="container">
+
+    <section class="page-title">
+        <h2>Tela do RH</h2>
+        <p>Cadastro e acompanhamento de passaportes de candidatos.</p>
+    </section>
+
+    <section class="cards" id="dashboardCards">
+        <div class="card">
+            <span>Total cadastrados</span>
+            <strong id="totalPassports">0</strong>
+        </div>
+
+        <div class="card">
+            <span>Pendentes avaliação médica</span>
+            <strong id="pendingMedicalEvaluation">0</strong>
+        </div>
+
+        <div class="card">
+            <span>Aptos aguardando gerente</span>
+            <strong id="fitWaitingManagerDecision">0</strong>
+        </div>
+
+        <div class="card">
+            <span>Abertos</span>
+            <strong id="openPassports">0</strong>
+        </div>
+
+        <div class="card">
+            <span>Validados</span>
+            <strong id="validPassports">0</strong>
+        </div>
+
+        <div class="card">
+            <span>Inválidos</span>
+            <strong id="invalidPassports">0</strong>
+        </div>
+
+        <div class="card">
+            <span>Cancelados</span>
+            <strong id="canceledPassports">0</strong>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h3>Cadastrar novo passaporte</h3>
+
+        <form id="passportForm">
+            <div class="form-group">
+                <label for="candidateName">Nome do candidato</label>
+                <input type="text" id="candidateName" required>
+            </div>
+
+            <div class="form-group">
+                <label for="candidateCpf">CPF</label>
+                <input type="text" id="candidateCpf" required>
+            </div>
+
+            <div class="form-group">
+                <label for="jobPosition">Cargo pretendido</label>
+                <input type="text" id="jobPosition" required>
+            </div>
+
+            <button type="submit">Criar Passaporte</button>
+        </form>
+    </section>
+
+    <section class="panel">
+        <h3>Passaportes cadastrados</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Candidato</th>
+                    <th>CPF</th>
+                    <th>Cargo</th>
+                    <th>Médico</th>
+                    <th>Gerente</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="passportTableBody">
+            </tbody>
+        </table>
+    </section>
+
+</main>
+
+<script src="rh.js"></script>
+</body>
+</html>

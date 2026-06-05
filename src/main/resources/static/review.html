@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema Passaporte - Médico e Gerente</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+    <h1>Sistema Passaporte</h1>
+    <nav>
+        <a href="rh.html">RH</a>
+        <a href="review.html">Médico/Gerente</a>
+        <a href="dashboard.html">Dashboard</a>
+    </nav>
+</header>
+
+<main class="container">
+
+    <section class="page-title">
+        <h2>Tela Médico/Gerente</h2>
+        <p>Avaliação médica e decisão gerencial dos candidatos em processo de admissão.</p>
+    </section>
+
+    <section class="panel">
+        <h3>Selecionar passaporte</h3>
+
+        <div class="form-group">
+            <label for="passportSelect">Candidato</label>
+            <select id="passportSelect">
+                <option value="">Selecione um candidato</option>
+            </select>
+        </div>
+
+        <div id="passportDetails" class="details-box">
+            <p>Selecione um passaporte para visualizar os detalhes.</p>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h3>Área da Medicina do Trabalho</h3>
+
+        <form id="medicalForm">
+            <div class="form-group">
+                <label for="medicalResult">Resultado médico</label>
+                <select id="medicalResult" required>
+                    <option value="">Selecione</option>
+                    <option value="APTO">APTO</option>
+                    <option value="INAPTO">INAPTO</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="medicalNotes">Observações médicas</label>
+                <textarea id="medicalNotes" rows="4"></textarea>
+            </div>
+
+            <button type="submit">Salvar avaliação médica</button>
+        </form>
+    </section>
+
+    <section class="panel">
+        <h3>Área do Gerente</h3>
+
+        <form id="managerForm">
+            <div class="form-group">
+                <label for="managerDecision">Decisão do gerente</label>
+                <select id="managerDecision" required>
+                    <option value="">Selecione</option>
+                    <option value="APROVADO">APROVADO</option>
+                    <option value="REJEITADO">REJEITADO</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="managerNotes">Observações do gerente</label>
+                <textarea id="managerNotes" rows="4"></textarea>
+            </div>
+
+            <button type="submit">Salvar decisão do gerente</button>
+        </form>
+    </section>
+
+    <section class="panel danger-panel">
+        <h3>Cancelar passaporte</h3>
+        <p>Caso o processo precise ser encerrado, o passaporte pode ser marcado como CANCELADA.</p>
+        <button id="cancelButton" class="danger-button">Cancelar passaporte</button>
+    </section>
+
+</main>
+
+<script src="review.js"></script>
+</body>
+</html>

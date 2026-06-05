@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema Passaporte - Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+    <h1>Sistema Passaporte</h1>
+    <nav>
+        <a href="rh.html">RH</a>
+        <a href="review.html">Médico/Gerente</a>
+        <a href="dashboard.html">Dashboard</a>
+    </nav>
+</header>
+
+<main class="container">
+
+    <section class="page-title">
+        <h2>Dashboard Geral</h2>
+        <p>Resumo visual dos passaportes de candidatos no processo de admissão.</p>
+    </section>
+
+    <section class="cards">
+        <div class="card">
+            <span>Total cadastrados</span>
+            <strong id="totalPassports">0</strong>
+        </div>
+
+        <div class="card">
+            <span>Pendentes de avaliação médica</span>
+            <strong id="pendingMedicalEvaluation">0</strong>
+        </div>
+
+        <div class="card">
+            <span>Aptos aguardando gerente</span>
+            <strong id="fitWaitingManagerDecision">0</strong>
+        </div>
+
+        <div class="card">
+            <span>Abertos</span>
+            <strong id="openPassports">0</strong>
+        </div>
+
+        <div class="card">
+            <span>Validados</span>
+            <strong id="validPassports">0</strong>
+        </div>
+
+        <div class="card">
+            <span>Inválidos</span>
+            <strong id="invalidPassports">0</strong>
+        </div>
+
+        <div class="card">
+            <span>Cancelados</span>
+            <strong id="canceledPassports">0</strong>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h3>Passaportes cadastrados</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Candidato</th>
+                    <th>CPF</th>
+                    <th>Cargo</th>
+                    <th>Avaliação médica</th>
+                    <th>Decisão gerente</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="passportTableBody">
+            </tbody>
+        </table>
+    </section>
+
+</main>
+
+<script src="dashboard.js"></script>
+</body>
+</html>
