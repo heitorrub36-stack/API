@@ -14,6 +14,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 
@@ -55,6 +57,18 @@ public class Passport {
     private ManagerStatus managerStatus;
 
     private String managerNotes;
+
+    @ManyToOne
+    @JoinColumn(name = "created_by_rh")
+    private AppUser createdByRh;
+   
+    @ManyToOne
+    @JoinColumn(name = "medical_reviewer_id")
+    private AppUser medicalReviwer;
+     
+    @ManyToOne
+    @JoinColumn(name = "manager_reviewer_id")
+    private AppUser managerReviewer;
 
     public Passport() {
     }
@@ -146,4 +160,31 @@ public class Passport {
     public void setManagerNotes(String managerNotes) {
         this.managerNotes = managerNotes;
     }
+
+    public AppUser getCreatedByRh() {
+        return createdByRh;
+    }
+
+    public void setCreatedByRh(AppUser createdByRh) {
+        this.createdByRh = createdByRh;
+    }
+
+    public AppUser getMedicalReviwer() {
+        return medicalReviwer;
+    }
+
+    public void setMedicalReviwer(AppUser medicalReviwer) {
+        this.medicalReviwer = medicalReviwer;
+    }
+
+    public AppUser getManagerReviewer() {
+        return managerReviewer;
+    }
+
+    public void setManagerReviewer(AppUser managerReviewer) {
+        this.managerReviewer = managerReviewer;
+    }
+
+
+    
 }

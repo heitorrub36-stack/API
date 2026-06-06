@@ -1,5 +1,7 @@
 package com.project.passport.api.dto;
 
+import java.util.UUID;
+
 public class PassportDto {
 
 
@@ -8,6 +10,8 @@ public class PassportDto {
     private String candidateCpf;
 
     private String jobPosition;
+
+    private UUID createdByRh;
 
     public String getCandidateName() {
         return candidateName;
@@ -32,4 +36,16 @@ public class PassportDto {
     public void setJobPosition(String jobPosition) {
         this.jobPosition = jobPosition;
     }
+
+    public UUID getCreatedByRh() {
+        return createdByRh;
+    }
+
+    public void setCreatedByRh(UUID createdByRh) {
+        this.createdByRh = createdByRh;
+    }
+
+
+
+    
 }

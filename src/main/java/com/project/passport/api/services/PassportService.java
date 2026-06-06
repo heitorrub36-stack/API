@@ -8,12 +8,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.project.passport.api.dto.AppUserDto;
 import com.project.passport.api.dto.ManagerReviewDto;
 import com.project.passport.api.dto.MedicalReviewDto;
 import com.project.passport.api.dto.PassportDto;
 import com.project.passport.api.enums.ManagerStatus;
 import com.project.passport.api.enums.MedicalStatus;
+import com.project.passport.api.enums.UserRole;
 import com.project.passport.api.enums.WorkflowStatus;
+import com.project.passport.api.model.AppUser;
 import com.project.passport.api.model.Passport;
 import com.project.passport.api.repository.PassportRepository;
 
@@ -21,13 +24,18 @@ import com.project.passport.api.repository.PassportRepository;
 public class PassportService {
 
     private final PassportRepository passportRepository;
+    private final AppUserService appUserService;
 
-    public PassportService(PassportRepository passportRepository) {
+    public PassportService(PassportRepository passportRepository, AppUserService appUserService) {
         this.passportRepository = passportRepository;
+        this.appUserService = appUserService;
     }
 
     public Passport createPassport(PassportDto dto) {
         validatePassportDto(dto);
+
+        AppUser rhUser = appUserService.getAppUserById(AppUserDto.getCreatedByRhId());
+        validateUserRole(rhUser, UserRole.RH, "Only RH users can create passports");
 
         Passport passport = new Passport();
         passport.setCandidateName(dto.getCandidateName());
@@ -37,9 +45,11 @@ public class PassportService {
         passport.setStatus(WorkflowStatus.ABERTA);
         passport.setMedicalStatus(MedicalStatus.PENDENTE);
         passport.setManagerStatus(ManagerStatus.PENDENTE);
+        passport.setCreatedByRh(rhUser);
 
         return passportRepository.save(passport);
     }
+
 
     public List<Passport> getAllPassports() {
         return passportRepository.findAll();
@@ -54,6 +64,9 @@ public class PassportService {
         if (dto == null || dto.getMedicalStatus() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Medical status is required");
         }
+
+        AppUser medicalUser = appUserService.getAppUserById(AppUserDto.getMedicalReviewerId())
+         validateUserRole(medicalUser, UserRole.MEDICINA_TRABALHO, "Only Medicina do Trabalho can review medical status");
 
         Passport passport = getPassportById(id);
         ensureNotCancelled(passport);
@@ -108,6 +121,9 @@ public class PassportService {
         Passport passport = getPassportById(id);
         passportRepository.delete(passport);
     }
+
+
+
 
     private void validatePassportDto(PassportDto dto) {
         if (dto == null) {
