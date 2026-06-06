@@ -10,7 +10,7 @@ public class ManagerReviewDto {
 
     private String managerNotes;
 
-    private UUID medicalReviwerId;
+    private UUID managerReviewerId;
 
     public ManagerStatus getManagerStatus() {
         return managerStatus;
@@ -28,12 +28,12 @@ public class ManagerReviewDto {
         this.managerNotes = managerNotes;
     }
 
-    public UUID getMedicalReviwerId() {
-        return medicalReviwerId;
+    public UUID getManagerReviewerId() {
+        return managerReviewerId;
     }
 
-    public void setMedicalReviwerId(UUID medicalReviwerId) {
-        this.medicalReviwerId = medicalReviwerId;
+    public void setManagerReviewerId(UUID managerReviewerId) {
+        this.managerReviewerId = managerReviewerId;
     }
 
     

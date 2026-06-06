@@ -8,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.project.passport.api.dto.AppUserDto;
 import com.project.passport.api.dto.ManagerReviewDto;
 import com.project.passport.api.dto.MedicalReviewDto;
 import com.project.passport.api.dto.PassportDto;
@@ -34,9 +33,6 @@ public class PassportService {
     public Passport createPassport(PassportDto dto) {
         validatePassportDto(dto);
 
-        AppUser rhUser = appUserService.getAppUserById(AppUserDto.getCreatedByRhId());
-        validateUserRole(rhUser, UserRole.RH, "Only RH users can create passports");
-
         Passport passport = new Passport();
         passport.setCandidateName(dto.getCandidateName());
         passport.setCandidateCpf(dto.getCandidateCpf());
@@ -45,7 +41,12 @@ public class PassportService {
         passport.setStatus(WorkflowStatus.ABERTA);
         passport.setMedicalStatus(MedicalStatus.PENDENTE);
         passport.setManagerStatus(ManagerStatus.PENDENTE);
-        passport.setCreatedByRh(rhUser);
+
+        if (dto.getCreatedByRh() != null) {
+            AppUser rhUser = appUserService.getAppUserById(dto.getCreatedByRh());
+            validateUserRole(rhUser, UserRole.RH, "Only RH users can create passports");
+            passport.setCreatedByRh(rhUser);
+        }
 
         return passportRepository.save(passport);
     }
@@ -65,14 +66,18 @@ public class PassportService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Medical status is required");
         }
 
-        AppUser medicalUser = appUserService.getAppUserById(AppUserDto.getMedicalReviewerId())
-         validateUserRole(medicalUser, UserRole.MEDICINA_TRABALHO, "Only Medicina do Trabalho can review medical status");
-
         Passport passport = getPassportById(id);
         ensureNotCancelled(passport);
 
         passport.setMedicalStatus(dto.getMedicalStatus());
         passport.setMedicalNotes(dto.getMedicalNotes());
+
+        if (dto.getMedicalReviewerId() != null) {
+            AppUser medicalUser = appUserService.getAppUserById(dto.getMedicalReviewerId());
+            validateUserRole(medicalUser, UserRole.MEDICINA_TRABALHO,
+                    "Only Medicina do Trabalho can review medical status");
+            passport.setMedicalReviewer(medicalUser);
+        }
 
         updateStatus(passport);
 
@@ -89,6 +94,12 @@ public class PassportService {
 
         passport.setManagerStatus(dto.getManagerStatus());
         passport.setManagerNotes(dto.getManagerNotes());
+
+        if (dto.getManagerReviewerId() != null) {
+            AppUser managerUser = appUserService.getAppUserById(dto.getManagerReviewerId());
+            validateUserRole(managerUser, UserRole.GERENTE, "Only Gerente can review manager status");
+            passport.setManagerReviewer(managerUser);
+        }
 
         updateStatus(passport);
 
@@ -138,6 +149,10 @@ public class PassportService {
         if (isBlank(dto.getJobPosition())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Job position is required");
         }
+
+        if(dto.getCreatedByRh() == null){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "RH user is required");
+        }
     }
 
     private boolean isBlank(String value) {
@@ -147,6 +162,15 @@ public class PassportService {
     private void ensureNotCancelled(Passport passport) {
         if (passport.getStatus() == WorkflowStatus.CANCELADA) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Cancelled passport cannot be reviewed");
+        }
+    }
+
+    private void validateUserRole(AppUser user, UserRole expectedRole, String message) {
+        if (user.getRole() != expectedRole) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
+        }
+        if (!user.isActive()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is inactive");
         }
     }
 }

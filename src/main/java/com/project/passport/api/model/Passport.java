@@ -64,7 +64,7 @@ public class Passport {
    
     @ManyToOne
     @JoinColumn(name = "medical_reviewer_id")
-    private AppUser medicalReviwer;
+    private AppUser medicalReviewer;
      
     @ManyToOne
     @JoinColumn(name = "manager_reviewer_id")
@@ -169,12 +169,12 @@ public class Passport {
         this.createdByRh = createdByRh;
     }
 
-    public AppUser getMedicalReviwer() {
-        return medicalReviwer;
+    public AppUser getMedicalReviewer() {
+        return medicalReviewer;
     }
 
-    public void setMedicalReviwer(AppUser medicalReviwer) {
-        this.medicalReviwer = medicalReviwer;
+    public void setMedicalReviewer(AppUser medicalReviewer) {
+        this.medicalReviewer = medicalReviewer;
     }
 
     public AppUser getManagerReviewer() {
