@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema Passaporte - RH</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -10,9 +11,10 @@
 <header class="topbar">
     <h1>Sistema Passaporte</h1>
     <nav>
-        <a href="rh.html">RH</a>
-        <a href="review.html">Médico/Gerente</a>
+        <a href="rh.html" class="active">RH</a>
+        <a href="review.html">Medicina/Gerente</a>
         <a href="dashboard.html">Dashboard</a>
+        <a href="demo.html">Demo</a>
     </nav>
 </header>
 
@@ -24,64 +26,52 @@
     </section>
 
     <section class="cards" id="dashboardCards">
-        <div class="card">
-            <span>Total cadastrados</span>
-            <strong id="totalPassports">0</strong>
-        </div>
-
-        <div class="card">
-            <span>Pendentes avaliação médica</span>
-            <strong id="pendingMedicalEvaluation">0</strong>
-        </div>
-
-        <div class="card">
-            <span>Aptos aguardando gerente</span>
-            <strong id="fitWaitingManagerStatus">0</strong>
-        </div>
-
-        <div class="card">
-            <span>Abertos</span>
-            <strong id="openPassports">0</strong>
-        </div>
-
-        <div class="card">
-            <span>Validados</span>
-            <strong id="validPassports">0</strong>
-        </div>
-
-        <div class="card">
-            <span>Inválidos</span>
-            <strong id="invalidPassports">0</strong>
-        </div>
-
-        <div class="card">
-            <span>Cancelados</span>
-            <strong id="canceledPassports">0</strong>
-        </div>
+        <div class="card"><span>Total cadastrados</span><strong id="totalPassports">0</strong></div>
+        <div class="card"><span>Pendentes de avalia&ccedil;&atilde;o m&eacute;dica</span><strong id="pendingMedicalEvaluation">0</strong></div>
+        <div class="card"><span>Aptos aguardando gerente</span><strong id="fitWaitingManagerStatus">0</strong></div>
+        <div class="card"><span>Abertos</span><strong id="openPassports">0</strong></div>
+        <div class="card"><span>Validados</span><strong id="validPassports">0</strong></div>
+        <div class="card"><span>Inv&aacute;lidos</span><strong id="invalidPassports">0</strong></div>
+        <div class="card"><span>Cancelados</span><strong id="canceledPassports">0</strong></div>
     </section>
 
     <section class="panel">
-        <h3>Cadastrar novo passaporte</h3>
+        <div class="panel-heading">
+            <h3>Cadastrar novo passaporte</h3>
+            <button type="button" class="ghost-button" id="createDefaultRhButton">Criar RH padr&atilde;o</button>
+        </div>
+
+        <p class="message" id="formMessage" hidden></p>
 
         <form id="passportForm">
-            <div class="form-group">
-                <label for="candidateName">Nome do candidato <span class="required-mark">*</span></label>
-                <input type="text" id="candidateName" required>
-            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="createdByRh">Respons&aacute;vel RH <span class="required-mark">*</span></label>
+                    <select id="createdByRh" required>
+                        <option value="">Carregando usu&aacute;rios...</option>
+                    </select>
+                    <small class="field-hint">O backend exige um usu&aacute;rio ativo com papel RH.</small>
+                </div>
 
-            <div class="form-group">
-                <label for="candidateCpf">CPF <span class="required-mark">*</span></label>
-                <input type="text" id="candidateCpf" required>
-            </div>
+                <div class="form-group">
+                    <label for="candidateName">Nome do candidato <span class="required-mark">*</span></label>
+                    <input type="text" id="candidateName" required autocomplete="off">
+                </div>
 
-            <div class="form-group">
-                <label for="jobPosition">Cargo pretendido <span class="required-mark">*</span></label>
-                <input type="text" id="jobPosition" required>
+                <div class="form-group">
+                    <label for="candidateCpf">CPF <span class="required-mark">*</span></label>
+                    <input type="text" id="candidateCpf" required autocomplete="off">
+                </div>
+
+                <div class="form-group">
+                    <label for="jobPosition">Cargo pretendido <span class="required-mark">*</span></label>
+                    <input type="text" id="jobPosition" required autocomplete="off">
+                </div>
             </div>
 
             <div class="form-grid">
                 <div class="form-group">
-                    <label for="medicalDocuments">Documentos para M&eacute;dico <span class="required-mark">*</span></label>
+                    <label for="medicalDocuments">Documentos para Medicina <span class="required-mark">*</span></label>
                     <input type="file" id="medicalDocuments" multiple required>
                     <small class="field-hint">Apenas a Medicina visualizar&aacute; estes anexos.</small>
                 </div>
@@ -93,28 +83,29 @@
                 </div>
             </div>
 
-            <button type="submit"><span class="button-icon">+</span> Criar Passaporte</button>
+            <button type="submit"><span class="button-icon">+</span> Criar passaporte</button>
         </form>
     </section>
 
     <section class="panel">
         <h3>Passaportes cadastrados</h3>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Candidato</th>
-                    <th>CPF</th>
-                    <th>Cargo</th>
-                    <th>Médico</th>
-                    <th>Gerente</th>
-                    <th>Anexos</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody id="passportTableBody">
-            </tbody>
-        </table>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Candidato</th>
+                        <th>CPF</th>
+                        <th>Cargo</th>
+                        <th>Medicina</th>
+                        <th>Gerente</th>
+                        <th>Anexos</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="passportTableBody"></tbody>
+            </table>
+        </div>
     </section>
 
 </main>

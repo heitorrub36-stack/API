@@ -21,9 +21,12 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.project.passport.api.enums.ManagerStatus;
 import com.project.passport.api.enums.MedicalStatus;
+import com.project.passport.api.enums.UserRole;
 import com.project.passport.api.enums.WorkflowStatus;
+import com.project.passport.api.model.AppUser;
 import com.project.passport.api.model.Artifact;
 import com.project.passport.api.model.Passport;
+import com.project.passport.api.repository.AppUserRepository;
 import com.project.passport.api.repository.ArtifactRepository;
 import com.project.passport.api.repository.PassportRepository;
 
@@ -40,10 +43,14 @@ class ApiApplicationTests {
 	@Autowired
 	private ArtifactRepository artifactRepository;
 
+	@Autowired
+	private AppUserRepository appUserRepository;
+
 	@BeforeEach
 	void setUp() {
 		artifactRepository.deleteAll();
 		passportRepository.deleteAll();
+		appUserRepository.deleteAll();
 	}
 
 	@Test
@@ -52,15 +59,18 @@ class ApiApplicationTests {
 
 	@Test
 	void createPassportWithValidData() throws Exception {
+		AppUser rhUser = saveAppUser(UserRole.RH);
+
 		mockMvc.perform(post("/api/passports")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("""
 						{
 						  "candidateName": "Maria Silva",
 						  "candidateCpf": "12345678900",
-						  "jobPosition": "Analista de RH"
+						  "jobPosition": "Analista de RH",
+						  "createdByRh": "%s"
 						}
-						"""))
+						""".formatted(rhUser.getId())))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.id", notNullValue()))
 				.andExpect(jsonPath("$.candidateName").value("Maria Silva"))
@@ -82,6 +92,7 @@ class ApiApplicationTests {
 					assertThat(passport.getStatus()).isEqualTo(WorkflowStatus.ABERTA);
 					assertThat(passport.getMedicalStatus()).isEqualTo(MedicalStatus.PENDENTE);
 					assertThat(passport.getManagerStatus()).isEqualTo(ManagerStatus.PENDENTE);
+					assertThat(passport.getCreatedByRh().getId()).isEqualTo(rhUser.getId());
 				});
 	}
 
@@ -222,6 +233,16 @@ class ApiApplicationTests {
 		passport.setManagerStatus(ManagerStatus.PENDENTE);
 
 		return passportRepository.save(passport);
+	}
+
+	private AppUser saveAppUser(UserRole role) {
+		AppUser appUser = new AppUser();
+		appUser.setName("User " + role.name());
+		appUser.setEmail(role.name().toLowerCase() + "." + System.nanoTime() + "@example.com");
+		appUser.setRole(role);
+		appUser.setActive(true);
+
+		return appUserRepository.save(appUser);
 	}
 
 	private Artifact saveArtifact(Passport passport) {

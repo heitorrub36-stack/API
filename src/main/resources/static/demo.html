@@ -2,7 +2,8 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Sistema Passaporte - Demonstra&ccedil;&atilde;o</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Passaporte - Demo</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -10,246 +11,66 @@
 <header class="topbar">
     <h1>Sistema Passaporte</h1>
     <nav>
-        <button class="tab-button active" data-tab="rh">RH</button>
-        <button class="tab-button" data-tab="medical">M&eacute;dico</button>
-        <button class="tab-button" data-tab="manager">Gerente</button>
-        <button class="tab-button" data-tab="dashboard">Dashboard</button>
+        <a href="rh.html">RH</a>
+        <a href="review.html">Medicina/Gerente</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="demo.html" class="active">Demo</a>
     </nav>
 </header>
 
 <main class="container">
+    <section class="page-title">
+        <h2>Demo do sistema</h2>
+        <p>Acesse os fluxos principais e acompanhe os indicadores atuais da API.</p>
+    </section>
 
-    <!-- ABA RH -->
-    <section id="rh" class="tab-content active">
-        <section class="page-title">
-            <h2>Tela do RH</h2>
-            <p>Cadastro e acompanhamento de passaportes de candidatos.</p>
-        </section>
+    <section class="cards">
+        <div class="card"><span>Total cadastrados</span><strong id="totalPassports">0</strong></div>
+        <div class="card"><span>Pendentes de avalia&ccedil;&atilde;o m&eacute;dica</span><strong id="pendingMedicalEvaluation">0</strong></div>
+        <div class="card"><span>Aptos aguardando gerente</span><strong id="fitWaitingManagerStatus">0</strong></div>
+        <div class="card"><span>Abertos</span><strong id="openPassports">0</strong></div>
+        <div class="card"><span>Validados</span><strong id="validPassports">0</strong></div>
+        <div class="card"><span>Inv&aacute;lidos</span><strong id="invalidPassports">0</strong></div>
+        <div class="card"><span>Cancelados</span><strong id="canceledPassports">0</strong></div>
+    </section>
 
-        <section class="panel">
-            <h3>Cadastrar novo passaporte</h3>
-
-            <form id="passportForm">
-                <div class="form-group">
-                    <label for="candidateName">Nome do candidato <span class="required-mark">*</span></label>
-                    <input type="text" id="candidateName" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="candidateCpf">CPF <span class="required-mark">*</span></label>
-                    <input type="text" id="candidateCpf" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="jobPosition">Cargo pretendido <span class="required-mark">*</span></label>
-                    <input type="text" id="jobPosition" required>
-                </div>
-
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="medicalDocuments">Documentos para M&eacute;dico <span class="required-mark">*</span></label>
-                        <input type="file" id="medicalDocuments" multiple required>
-                        <small class="field-hint">Apenas a Medicina visualizar&aacute; estes anexos.</small>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="managerDocuments">Documentos para Gerente <span class="required-mark">*</span></label>
-                        <input type="file" id="managerDocuments" multiple required>
-                        <small class="field-hint">Apenas o Gerente visualizar&aacute; estes anexos.</small>
+    <section class="panel">
+        <h3>Fluxos</h3>
+        <div class="artifact-grid">
+            <article class="artifact-card">
+                <div class="artifact-heading">
+                    <span class="artifact-icon pending">RH</span>
+                    <div>
+                        <strong>Cadastro de passaporte</strong>
+                        <span>Crie candidatos, selecione o respons&aacute;vel RH e anexe documentos.</span>
                     </div>
                 </div>
+                <a class="ghost-button link-button" href="rh.html">Abrir RH</a>
+            </article>
 
-                <button type="submit"><span class="button-icon">+</span> Criar Passaporte</button>
-            </form>
-        </section>
-
-        <section class="panel">
-            <h3>Passaportes cadastrados</h3>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>Candidato</th>
-                        <th>CPF</th>
-                        <th>Cargo</th>
-                        <th>M&eacute;dico</th>
-                        <th>Gerente</th>
-                        <th>Anexos</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody id="rhPassportTableBody"></tbody>
-            </table>
-        </section>
-    </section>
-
-    <!-- ABA MEDICO -->
-    <section id="medical" class="tab-content">
-        <section class="page-title">
-            <h2>Tela M&eacute;dico</h2>
-            <p>Avalia&ccedil;&atilde;o m&eacute;dica dos candidatos.</p>
-        </section>
-
-        <section class="panel">
-            <h3>Selecionar passaporte</h3>
-
-            <div class="form-group">
-                    <label for="medicalPassportSelect">Candidato <span class="required-mark">*</span></label>
-                <select id="medicalPassportSelect">
-                    <option value="">Selecione um candidato</option>
-                </select>
-            </div>
-
-            <div id="medicalPassportDetails" class="details-box">
-                <p>Selecione um passaporte para visualizar os detalhes.</p>
-            </div>
-
-            <div id="medicalArtifacts" class="artifact-list">
-                <p>Os anexos do candidato aparecer&atilde;o aqui.</p>
-            </div>
-        </section>
-
-        <section class="panel">
-            <h3>&Aacute;rea da Medicina do Trabalho</h3>
-
-            <form id="medicalForm">
-                <div class="form-group">
-                    <label for="medicalStatus">Resultado m&eacute;dico <span class="required-mark">*</span></label>
-                    <select id="medicalStatus" required>
-                        <option value="">Selecione</option>
-                        <option value="APTO">APTO</option>
-                        <option value="INAPTO">INAPTO</option>
-                    </select>
+            <article class="artifact-card">
+                <div class="artifact-heading">
+                    <span class="artifact-icon pending">MG</span>
+                    <div>
+                        <strong>Medicina e Gerente</strong>
+                        <span>Avalie documentos, resultado m&eacute;dico, decis&atilde;o gerencial e cancelamento.</span>
+                    </div>
                 </div>
+                <a class="ghost-button link-button" href="review.html">Abrir avalia&ccedil;&otilde;es</a>
+            </article>
 
-                <div class="form-group">
-                    <label for="medicalNotes">Observa&ccedil;&otilde;es m&eacute;dicas</label>
-                    <textarea id="medicalNotes" rows="4"></textarea>
+            <article class="artifact-card">
+                <div class="artifact-heading">
+                    <span class="artifact-icon pending">DB</span>
+                    <div>
+                        <strong>Dashboard</strong>
+                        <span>Veja os indicadores e a lista consolidada de passaportes.</span>
+                    </div>
                 </div>
-
-                <button type="submit">Salvar avalia&ccedil;&atilde;o m&eacute;dica</button>
-            </form>
-        </section>
+                <a class="ghost-button link-button" href="dashboard.html">Abrir dashboard</a>
+            </article>
+        </div>
     </section>
-
-    <!-- ABA GERENTE -->
-    <section id="manager" class="tab-content">
-        <section class="page-title">
-            <h2>Tela Gerente</h2>
-            <p>Decis&atilde;o gerencial dos candidatos.</p>
-        </section>
-
-        <section class="panel">
-            <h3>Selecionar passaporte</h3>
-
-            <div class="form-group">
-                    <label for="managerPassportSelect">Candidato <span class="required-mark">*</span></label>
-                <select id="managerPassportSelect">
-                    <option value="">Selecione um candidato</option>
-                </select>
-            </div>
-
-            <div id="managerPassportDetails" class="details-box">
-                <p>Selecione um passaporte para visualizar os detalhes.</p>
-            </div>
-
-            <div id="managerArtifacts" class="artifact-list">
-                <p>Os anexos do candidato para o gerente aparecer&atilde;o aqui.</p>
-            </div>
-        </section>
-
-        <section class="panel">
-            <h3>&Aacute;rea do Gerente</h3>
-
-            <form id="managerForm">
-                <div class="form-group">
-                    <label for="managerStatus">Decis&atilde;o do gerente <span class="required-mark">*</span></label>
-                    <select id="managerStatus" required>
-                        <option value="">Selecione</option>
-                        <option value="APROVADO">APROVADO</option>
-                        <option value="REPROVADO">REPROVADO</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="managerNotes">Observa&ccedil;&otilde;es do gerente</label>
-                    <textarea id="managerNotes" rows="4"></textarea>
-                </div>
-
-                <button type="submit">Salvar decis&atilde;o do gerente</button>
-            </form>
-        </section>
-
-        <section class="panel danger-panel">
-            <h3>Cancelar passaporte</h3>
-            <p>Marca o passaporte como CANCELADA.</p>
-            <button id="cancelButton" class="danger-button">Cancelar passaporte</button>
-        </section>
-    </section>
-
-    <!-- ABA DASHBOARD -->
-    <section id="dashboard" class="tab-content">
-        <section class="page-title">
-            <h2>Dashboard Geral</h2>
-            <p>Resumo visual dos passaportes no processo de admiss&atilde;o.</p>
-        </section>
-
-        <section class="cards">
-            <div class="card">
-                <span>Total cadastrados</span>
-                <strong id="totalPassports">0</strong>
-            </div>
-
-            <div class="card">
-                <span>Pendentes avalia&ccedil;&atilde;o m&eacute;dica</span>
-                <strong id="pendingMedicalEvaluation">0</strong>
-            </div>
-
-            <div class="card">
-                <span>Aptos aguardando gerente</span>
-                <strong id="fitWaitingManagerStatus">0</strong>
-            </div>
-
-            <div class="card">
-                <span>Abertos</span>
-                <strong id="openPassports">0</strong>
-            </div>
-
-            <div class="card">
-                <span>Validados</span>
-                <strong id="validPassports">0</strong>
-            </div>
-
-            <div class="card">
-                <span>Inv&aacute;lidos</span>
-                <strong id="invalidPassports">0</strong>
-            </div>
-
-            <div class="card">
-                <span>Cancelados</span>
-                <strong id="canceledPassports">0</strong>
-            </div>
-        </section>
-
-        <section class="panel">
-            <h3>Resumo dos passaportes</h3>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>Candidato</th>
-                        <th>CPF</th>
-                        <th>Cargo</th>
-                        <th>M&eacute;dico</th>
-                        <th>Gerente</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody id="dashboardPassportTableBody"></tbody>
-            </table>
-        </section>
-    </section>
-
 </main>
 
 <script src="demo.js"></script>

@@ -1,24 +1,98 @@
 const API_BASE_URL = "http://localhost:8080/api";
 
-document.addEventListener("DOMContentLoaded", () => {
-    loadDashboard();
-    loadPassports();
+let rhUsers = [];
 
+document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("passportForm").addEventListener("submit", createPassport);
+    document.getElementById("createDefaultRhButton").addEventListener("click", createDefaultRhUser);
+
+    loadPageData();
 });
+
+async function loadPageData() {
+    await Promise.all([
+        loadRhUsers(),
+        loadDashboard(),
+        loadPassports()
+    ]);
+}
+
+async function loadRhUsers() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/users`);
+        if (!response.ok) {
+            throw new Error("Falha ao carregar usuarios.");
+        }
+
+        const users = await response.json();
+        rhUsers = users.filter(user => user.role === "RH" && user.active);
+        renderRhUsers();
+    } catch (error) {
+        console.error("Erro ao carregar usuarios RH:", error);
+        showMessage("Nao foi possivel carregar os usuarios RH.", "error");
+        renderRhUsers();
+    }
+}
+
+function renderRhUsers() {
+    const select = document.getElementById("createdByRh");
+    select.innerHTML = `<option value="">Selecione o responsavel RH</option>`;
+
+    rhUsers.forEach(user => {
+        const option = document.createElement("option");
+        option.value = user.id;
+        option.textContent = `${user.name} (${user.email})`;
+        select.appendChild(option);
+    });
+
+    if (!rhUsers.length) {
+        select.innerHTML = `<option value="">Nenhum RH ativo cadastrado</option>`;
+        showMessage("Cadastre um usuario RH ou use o botao Criar RH padrao para liberar o cadastro.", "warning");
+    }
+}
+
+async function createDefaultRhUser() {
+    const payload = {
+        name: "RH Padrao",
+        email: "rh.padrao@passport.local",
+        role: "RH",
+        active: true
+    };
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/users`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok && response.status !== 409) {
+            throw new Error("Falha ao criar usuario RH.");
+        }
+
+        await loadRhUsers();
+        showMessage("Usuario RH pronto para uso.", "success");
+    } catch (error) {
+        console.error("Erro ao criar usuario RH:", error);
+        showMessage("Nao foi possivel criar o usuario RH padrao.", "error");
+    }
+}
 
 async function loadDashboard() {
     try {
         const response = await fetch(`${API_BASE_URL}/dashboard`);
-        const data = await response.json();
+        if (!response.ok) {
+            throw new Error("Falha ao carregar dashboard.");
+        }
 
-        document.getElementById("totalPassports").textContent = data.totalPassports;
-        document.getElementById("pendingMedicalEvaluation").textContent = data.pendingMedicalEvaluation;
-        document.getElementById("fitWaitingManagerStatus").textContent = data.fitWaitingManagerStatus;
-        document.getElementById("openPassports").textContent = data.openPassports;
-        document.getElementById("validPassports").textContent = data.validPassports;
-        document.getElementById("invalidPassports").textContent = data.invalidPassports;
-        document.getElementById("canceledPassports").textContent = data.canceledPassports;
+        const data = await response.json();
+        setText("totalPassports", data.totalPassports);
+        setText("pendingMedicalEvaluation", data.pendingMedicalEvaluation);
+        setText("fitWaitingManagerStatus", data.fitWaitingManagerStatus);
+        setText("openPassports", data.openPassports);
+        setText("validPassports", data.validPassports);
+        setText("invalidPassports", data.invalidPassports);
+        setText("canceledPassports", data.canceledPassports);
     } catch (error) {
         console.error("Erro ao carregar dashboard:", error);
     }
@@ -27,14 +101,26 @@ async function loadDashboard() {
 async function loadPassports() {
     try {
         const response = await fetch(`${API_BASE_URL}/passports`);
+        if (!response.ok) {
+            throw new Error("Falha ao carregar passaportes.");
+        }
+
         const passports = await response.json();
         const rows = await Promise.all(passports.map(renderPassportRow));
 
         const tableBody = document.getElementById("passportTableBody");
         tableBody.innerHTML = "";
+
+        if (!rows.length) {
+            tableBody.innerHTML = `<tr><td colspan="7" class="empty-cell">Nenhum passaporte cadastrado.</td></tr>`;
+            return;
+        }
+
         rows.forEach(row => tableBody.appendChild(row));
     } catch (error) {
         console.error("Erro ao carregar passaportes:", error);
+        document.getElementById("passportTableBody").innerHTML =
+            `<tr><td colspan="7" class="empty-cell">Nao foi possivel carregar os passaportes.</td></tr>`;
     }
 }
 
@@ -43,17 +129,13 @@ async function renderPassportRow(passport) {
     const row = document.createElement("tr");
 
     row.innerHTML = `
-        <td>${passport.candidateName}</td>
-        <td>${passport.candidateCpf}</td>
-        <td>${passport.jobPosition}</td>
+        <td>${escapeHtml(passport.candidateName)}</td>
+        <td>${escapeHtml(passport.candidateCpf)}</td>
+        <td>${escapeHtml(passport.jobPosition)}</td>
         <td>${statusWithIcon(passport.medicalStatus)}</td>
         <td>${statusWithIcon(passport.managerStatus)}</td>
         <td>${renderAttachmentSummary(artifacts)}</td>
-        <td>
-            <span class="status ${getStatusClass(passport.status)}">
-                ${passport.status}
-            </span>
-        </td>
+        <td><span class="status ${getStatusClass(passport.status)}">${escapeHtml(passport.status)}</span></td>
     `;
 
     return row;
@@ -65,28 +147,33 @@ async function createPassport(event) {
     const medicalDocumentsInput = document.getElementById("medicalDocuments");
     const managerDocumentsInput = document.getElementById("managerDocuments");
 
+    if (!document.getElementById("createdByRh").value) {
+        showMessage("Selecione um responsavel RH antes de cadastrar.", "error");
+        return;
+    }
+
     if (!medicalDocumentsInput.files.length || !managerDocumentsInput.files.length) {
-        alert("Anexe ao menos um documento para o Medico e um para o Gerente.");
+        showMessage("Anexe ao menos um documento para Medicina e um para Gerente.", "error");
         return;
     }
 
     const passport = {
-        candidateName: document.getElementById("candidateName").value,
-        candidateCpf: document.getElementById("candidateCpf").value,
-        jobPosition: document.getElementById("jobPosition").value
+        candidateName: document.getElementById("candidateName").value.trim(),
+        candidateCpf: document.getElementById("candidateCpf").value.trim(),
+        jobPosition: document.getElementById("jobPosition").value.trim(),
+        createdByRh: document.getElementById("createdByRh").value
     };
 
     try {
         const response = await fetch(`${API_BASE_URL}/passports`, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(passport)
         });
 
         if (!response.ok) {
-            alert("Erro ao criar passaporte.");
+            const detail = await readError(response);
+            showMessage(detail || "Erro ao criar passaporte.", "error");
             return;
         }
 
@@ -95,14 +182,11 @@ async function createPassport(event) {
         await uploadArtifacts(createdPassport.id, managerDocumentsInput.files, "Documento gerencial do candidato", "Origem: CANDIDATO; Destino: GERENTE");
 
         document.getElementById("passportForm").reset();
-
-        await loadDashboard();
-        await loadPassports();
-
-        alert("Passaporte criado com anexos.");
+        await loadPageData();
+        showMessage("Passaporte criado com anexos.", "success");
     } catch (error) {
         console.error("Erro ao criar passaporte:", error);
-        alert("Erro ao conectar com a API.");
+        showMessage("Erro ao conectar com a API.", "error");
     }
 }
 
@@ -118,9 +202,7 @@ async function uploadArtifacts(passportId, files, documentNamePrefix, notes) {
 
         const response = await fetch(`${API_BASE_URL}/artifacts`, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(artifact)
         });
 
@@ -133,7 +215,6 @@ async function uploadArtifacts(passportId, files, documentNamePrefix, notes) {
     });
 
     const responses = await Promise.all(requests);
-
     if (responses.some(response => !response.ok)) {
         throw new Error("Erro ao registrar um ou mais anexos.");
     }
@@ -142,7 +223,6 @@ async function uploadArtifacts(passportId, files, documentNamePrefix, notes) {
 function saveArtifactFile(artifactId, file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
-
         reader.onload = () => {
             localStorage.setItem(`artifact-file-${artifactId}`, JSON.stringify({
                 name: file.name,
@@ -151,7 +231,6 @@ function saveArtifactFile(artifactId, file) {
             }));
             resolve();
         };
-
         reader.onerror = () => reject(reader.error);
         reader.readAsDataURL(file);
     });
@@ -160,7 +239,7 @@ function saveArtifactFile(artifactId, file) {
 async function loadArtifacts(passportId) {
     try {
         const response = await fetch(`${API_BASE_URL}/artifacts/passport/${passportId}`);
-        return response.ok ? response.json() : [];
+        return response.ok ? await response.json() : [];
     } catch (error) {
         console.error("Erro ao carregar anexos:", error);
         return [];
@@ -169,7 +248,7 @@ async function loadArtifacts(passportId) {
 
 function renderAttachmentSummary(artifacts) {
     if (!artifacts.length) {
-        return `<span class="required-warning">! Pendente</span>`;
+        return `<span class="required-warning">Pendente</span>`;
     }
 
     const valid = artifacts.filter(artifact => artifact.status === "VALIDA").length;
@@ -178,40 +257,52 @@ function renderAttachmentSummary(artifacts) {
 
     return `
         <span class="attachment-count">${artifacts.length} anexos</span>
-        <span class="mini-status">✓ ${valid}</span>
-        <span class="mini-status">! ${pending}</span>
-        <span class="mini-status">× ${invalid}</span>
+        <span class="mini-status">OK ${valid}</span>
+        <span class="mini-status">Pend. ${pending}</span>
+        <span class="mini-status">Inv. ${invalid}</span>
     `;
 }
 
 function statusWithIcon(value) {
-    if (value === "APTO" || value === "APROVADO") {
-        return `<span class="validation-icon ok">✓</span> ${value}`;
+    const status = value || "PENDENTE";
+    if (status === "APTO" || status === "APROVADO") {
+        return `<span class="validation-icon ok">OK</span> ${escapeHtml(status)}`;
     }
-
-    if (value === "INAPTO" || value === "REPROVADO") {
-        return `<span class="validation-icon bad">×</span> ${value}`;
+    if (status === "INAPTO" || status === "REPROVADO") {
+        return `<span class="validation-icon bad">X</span> ${escapeHtml(status)}`;
     }
-
-    return `<span class="validation-icon wait">!</span> ${value}`;
+    return `<span class="validation-icon wait">!</span> ${escapeHtml(status)}`;
 }
 
 function getStatusClass(status) {
-    if (status === "ABERTA") {
-        return "status-aberta";
-    }
+    return `status-${String(status || "").toLowerCase()}`;
+}
 
-    if (status === "VALIDA") {
-        return "status-valida";
-    }
+function showMessage(text, type) {
+    const message = document.getElementById("formMessage");
+    message.textContent = text;
+    message.className = `message ${type || ""}`;
+    message.hidden = false;
+}
 
-    if (status === "INVALIDA") {
-        return "status-invalida";
-    }
+function setText(id, value) {
+    document.getElementById(id).textContent = value ?? 0;
+}
 
-    if (status === "CANCELADA") {
-        return "status-cancelada";
+async function readError(response) {
+    try {
+        const data = await response.json();
+        return data.detail || data.message || data.error;
+    } catch (error) {
+        return "";
     }
+}
 
-    return "";
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
