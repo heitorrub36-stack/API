@@ -27,32 +27,75 @@ async function loadPassports() {
     try {
         const response = await fetch(`${API_BASE_URL}/passports`);
         const passports = await response.json();
+        const rows = await Promise.all(passports.map(renderPassportRow));
 
         const tableBody = document.getElementById("passportTableBody");
         tableBody.innerHTML = "";
-
-        passports.forEach(passport => {
-            const row = document.createElement("tr");
-
-            row.innerHTML = `
-                <td>${passport.candidateName}</td>
-                <td>${passport.candidateCpf}</td>
-                <td>${passport.jobPosition}</td>
-                <td>${passport.medicalResult}</td>
-                <td>${passport.managerDecision}</td>
-                <td>
-                    <span class="status ${getStatusClass(passport.status)}">
-                        ${passport.status}
-                    </span>
-                </td>
-            `;
-
-            tableBody.appendChild(row);
-        });
+        rows.forEach(row => tableBody.appendChild(row));
     } catch (error) {
         console.error("Erro ao carregar passaportes:", error);
         alert("Erro ao carregar passaportes.");
     }
+}
+
+async function renderPassportRow(passport) {
+    const artifacts = await loadArtifacts(passport.id);
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+        <td>${passport.candidateName}</td>
+        <td>${passport.candidateCpf}</td>
+        <td>${passport.jobPosition}</td>
+        <td>${statusWithIcon(passport.medicalResult)}</td>
+        <td>${statusWithIcon(passport.managerDecision)}</td>
+        <td>${renderAttachmentSummary(artifacts)}</td>
+        <td>
+            <span class="status ${getStatusClass(passport.status)}">
+                ${passport.status}
+            </span>
+        </td>
+    `;
+
+    return row;
+}
+
+async function loadArtifacts(passportId) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/artifacts/passport/${passportId}`);
+        return response.ok ? await response.json() : [];
+    } catch (error) {
+        console.error("Erro ao carregar anexos:", error);
+        return [];
+    }
+}
+
+function renderAttachmentSummary(artifacts) {
+    if (!artifacts.length) {
+        return `<span class="required-warning">! Pendente</span>`;
+    }
+
+    const valid = artifacts.filter(artifact => artifact.status === "VALIDADO").length;
+    const invalid = artifacts.filter(artifact => artifact.status === "INVALIDADO").length;
+    const pending = artifacts.length - valid - invalid;
+
+    return `
+        <span class="attachment-count">${artifacts.length} anexos</span>
+        <span class="mini-status">✓ ${valid}</span>
+        <span class="mini-status">! ${pending}</span>
+        <span class="mini-status">× ${invalid}</span>
+    `;
+}
+
+function statusWithIcon(value) {
+    if (value === "APTO" || value === "APROVADO") {
+        return `<span class="validation-icon ok">✓</span> ${value}`;
+    }
+
+    if (value === "INAPTO" || value === "REPROVADO") {
+        return `<span class="validation-icon bad">×</span> ${value}`;
+    }
+
+    return `<span class="validation-icon wait">!</span> ${value}`;
 }
 
 function getStatusClass(status) {
