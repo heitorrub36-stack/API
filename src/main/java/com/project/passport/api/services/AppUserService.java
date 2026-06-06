@@ -20,11 +20,11 @@ public class AppUserService {
         this.appUserRepository = appUserRepository;
     }
 
-    public AppUser createAppUser(AppUserDto appUserDto){
+    public AppUser createAppUser(AppUserDto appUserDto) {
         validateAppUserDto(appUserDto);
 
-        if(appUserRepository.existsByEmail(appUserDto.getEmail())){
-            throw new IllegalArgumentException("Email já existe");
+        if (appUserRepository.existsByEmail(appUserDto.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
         }
 
         AppUser appUser = new AppUser();
@@ -36,22 +36,23 @@ public class AppUserService {
         return appUserRepository.save(appUser);
     }
 
-
-
-    public List<AppUser> getAllAppUsers(){
+    public List<AppUser> getAllAppUsers() {
         return appUserRepository.findAll();
     }
 
-    public AppUser getAppUserbyId(UUID id){
-
+    public AppUser getAppUserById(UUID id) {
         return appUserRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
-    public AppUser upadateAppUser(UUID id, AppUserDto appUserDto){
 
+    public AppUser updateAppUser(UUID id, AppUserDto appUserDto) {
         validateAppUserDto(appUserDto);
 
-        AppUser appUser = getAppUserbyId(id);
+        AppUser appUser = getAppUserById(id);
+
+        if (appUserRepository.existsByEmailAndIdNot(appUserDto.getEmail(), id)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
+        }
 
         appUser.setName(appUserDto.getName());
         appUser.setEmail(appUserDto.getEmail());
@@ -59,21 +60,19 @@ public class AppUserService {
         appUser.setActive(appUserDto.getActive() != null ? appUserDto.getActive() : true);
 
         return appUserRepository.save(appUser);
-        
     }
 
-    public void deleteAppUser(UUID id){
-        AppUser appUser = getAppUserbyId(id);
+    public void deleteAppUser(UUID id) {
+        AppUser appUser = getAppUserById(id);
         appUserRepository.delete(appUser);
     }
 
     private void validateAppUserDto(AppUserDto appUserDto) {
-       
-        if(appUserDto == null){
+        if (appUserDto == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User data is required");
         }
 
-        if(isBlank(appUserDto.getName())){
+        if (isBlank(appUserDto.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User name is required");
         }
 
@@ -84,11 +83,9 @@ public class AppUserService {
         if (appUserDto.getRole() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User role is required");
         }
-
     }
 
     private boolean isBlank(String value) {
         return value == null || value.isBlank();
     }
-    
 }

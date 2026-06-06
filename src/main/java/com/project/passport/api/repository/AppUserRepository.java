@@ -10,5 +10,7 @@ public interface AppUserRepository extends JpaRepository<AppUser, UUID> {
 
 
     boolean existsByEmail(String email);
+
+    boolean existsByEmailAndIdNot(String email, UUID id);
     
 }
