@@ -1,6 +1,6 @@
 package com.project.passport.api.enums;
 
-public enum ManagerDecision {
+public enum ManagerStatus {
     PENDENTE,
     APROVADO,
     REPROVADO

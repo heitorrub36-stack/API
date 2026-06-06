@@ -3,9 +3,9 @@ package com.project.passport.api.model;
 import java.time.LocalDate;
 import java.util.UUID;
 
-import com.project.passport.api.enums.ManagerDecision;
-import com.project.passport.api.enums.MedicalResult;
-import com.project.passport.api.enums.PassportStatus;
+import com.project.passport.api.enums.ManagerStatus;
+import com.project.passport.api.enums.MedicalStatus;
+import com.project.passport.api.enums.WorkflowStatus;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -42,17 +42,17 @@ public class Passport {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private PassportStatus status;
-    
+    private WorkflowStatus status;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private MedicalResult medicalResult;
+    private MedicalStatus medicalStatus;
 
     private String medicalNotes;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ManagerDecision managerDecision;
+    private ManagerStatus managerStatus;
 
     private String managerNotes;
 
@@ -107,20 +107,20 @@ public class Passport {
         this.createdAt = createdAt;
     }
 
-    public PassportStatus getStatus() {
+    public WorkflowStatus getStatus() {
         return status;
     }
 
-    public void setStatus(PassportStatus status) {
+    public void setStatus(WorkflowStatus status) {
         this.status = status;
     }
 
-    public MedicalResult getMedicalResult() {
-        return medicalResult;
+    public MedicalStatus getMedicalStatus() {
+        return medicalStatus;
     }
 
-    public void setMedicalResult(MedicalResult medicalResult) {
-        this.medicalResult = medicalResult;
+    public void setMedicalStatus(MedicalStatus medicalStatus) {
+        this.medicalStatus = medicalStatus;
     }
 
     public String getMedicalNotes() {
@@ -131,12 +131,12 @@ public class Passport {
         this.medicalNotes = medicalNotes;
     }
 
-    public ManagerDecision getManagerDecision() {
-        return managerDecision;
+    public ManagerStatus getManagerStatus() {
+        return managerStatus;
     }
 
-    public void setManagerDecision(ManagerDecision managerDecision) {
-        this.managerDecision = managerDecision;
+    public void setManagerStatus(ManagerStatus managerStatus) {
+        this.managerStatus = managerStatus;
     }
 
     public String getManagerNotes() {
@@ -146,6 +146,4 @@ public class Passport {
     public void setManagerNotes(String managerNotes) {
         this.managerNotes = managerNotes;
     }
-
-    
 }

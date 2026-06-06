@@ -82,20 +82,20 @@ function showPassportDetails() {
                 ${selectedPassport.status}
             </span>
         </p>
-        <p><strong>Resultado medico:</strong> ${statusWithIcon(selectedPassport.medicalResult)}</p>
+        <p><strong>Resultado medico:</strong> ${statusWithIcon(selectedPassport.medicalStatus)}</p>
         <p><strong>Observacao medica:</strong> ${selectedPassport.medicalNotes || "Sem observacoes"}</p>
-        <p><strong>Decisao do gerente:</strong> ${statusWithIcon(selectedPassport.managerDecision)}</p>
+        <p><strong>Decisao do gerente:</strong> ${statusWithIcon(selectedPassport.managerStatus)}</p>
         <p><strong>Observacao do gerente:</strong> ${selectedPassport.managerNotes || "Sem observacoes"}</p>
     `;
 
-    document.getElementById("medicalResult").value =
-        selectedPassport.medicalResult === "PENDENTE" ? "" : selectedPassport.medicalResult;
+    document.getElementById("medicalStatus").value =
+        selectedPassport.medicalStatus === "PENDENTE" ? "" : selectedPassport.medicalStatus;
 
     document.getElementById("medicalNotes").value =
         selectedPassport.medicalNotes || "";
 
-    document.getElementById("managerDecision").value =
-        selectedPassport.managerDecision === "PENDENTE" ? "" : selectedPassport.managerDecision;
+    document.getElementById("managerStatus").value =
+        selectedPassport.managerStatus === "PENDENTE" ? "" : selectedPassport.managerStatus;
 
     document.getElementById("managerNotes").value =
         selectedPassport.managerNotes || "";
@@ -137,7 +137,7 @@ function renderArtifact(artifact) {
             <div class="artifact-heading">
                 <span class="artifact-icon ${getArtifactStatusClass(artifact.status)}">${getArtifactIcon(artifact.status)}</span>
                 <div>
-                    <strong>${artifact.doucumentName}</strong>
+                    <strong>${artifact.documentName}</strong>
                     <span>${artifact.fileName} - ${artifact.fileType}</span>
                 </div>
             </div>
@@ -242,7 +242,7 @@ async function updateMedicalReview(event) {
     }
 
     const body = {
-        medicalResult: document.getElementById("medicalResult").value,
+        medicalStatus: document.getElementById("medicalStatus").value,
         medicalNotes: document.getElementById("medicalNotes").value
     };
 
@@ -280,7 +280,7 @@ async function updateManagerReview(event) {
     }
 
     const body = {
-        managerDecision: document.getElementById("managerDecision").value,
+        managerStatus: document.getElementById("managerStatus").value,
         managerNotes: document.getElementById("managerNotes").value
     };
 
@@ -370,11 +370,11 @@ function statusWithIcon(value) {
 }
 
 function getArtifactIcon(status) {
-    if (status === "VALIDADO") {
+    if (status === "VALIDA") {
         return "✓";
     }
 
-    if (status === "INVALIDADO") {
+    if (status === "INVALIDA") {
         return "×";
     }
 
@@ -382,11 +382,11 @@ function getArtifactIcon(status) {
 }
 
 function getArtifactStatusClass(status) {
-    if (status === "VALIDADO") {
+    if (status === "VALIDA") {
         return "artifact-valid valid";
     }
 
-    if (status === "INVALIDADO") {
+    if (status === "INVALIDA") {
         return "artifact-invalid invalid";
     }
 

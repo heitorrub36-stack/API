@@ -19,10 +19,9 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.project.passport.api.enums.ArtifactsStatus;
-import com.project.passport.api.enums.ManagerDecision;
-import com.project.passport.api.enums.MedicalResult;
-import com.project.passport.api.enums.PassportStatus;
+import com.project.passport.api.enums.ManagerStatus;
+import com.project.passport.api.enums.MedicalStatus;
+import com.project.passport.api.enums.WorkflowStatus;
 import com.project.passport.api.model.Artifact;
 import com.project.passport.api.model.Passport;
 import com.project.passport.api.repository.ArtifactRepository;
@@ -68,9 +67,9 @@ class ApiApplicationTests {
 				.andExpect(jsonPath("$.candidateCpf").value("12345678900"))
 				.andExpect(jsonPath("$.jobPosition").value("Analista de RH"))
 				.andExpect(jsonPath("$.createdAt").value(LocalDate.now().toString()))
-				.andExpect(jsonPath("$.status").value(PassportStatus.ABERTA.name()))
-				.andExpect(jsonPath("$.medicalResult").value(MedicalResult.PENDENTE.name()))
-				.andExpect(jsonPath("$.managerDecision").value(ManagerDecision.PENDENTE.name()))
+				.andExpect(jsonPath("$.status").value(WorkflowStatus.ABERTA.name()))
+				.andExpect(jsonPath("$.medicalStatus").value(MedicalStatus.PENDENTE.name()))
+				.andExpect(jsonPath("$.managerStatus").value(ManagerStatus.PENDENTE.name()))
 				.andExpect(jsonPath("$.medicalNotes", nullValue()))
 				.andExpect(jsonPath("$.managerNotes", nullValue()));
 
@@ -80,9 +79,9 @@ class ApiApplicationTests {
 					assertThat(passport.getCandidateName()).isEqualTo("Maria Silva");
 					assertThat(passport.getCandidateCpf()).isEqualTo("12345678900");
 					assertThat(passport.getJobPosition()).isEqualTo("Analista de RH");
-					assertThat(passport.getStatus()).isEqualTo(PassportStatus.ABERTA);
-					assertThat(passport.getMedicalResult()).isEqualTo(MedicalResult.PENDENTE);
-					assertThat(passport.getManagerDecision()).isEqualTo(ManagerDecision.PENDENTE);
+					assertThat(passport.getStatus()).isEqualTo(WorkflowStatus.ABERTA);
+					assertThat(passport.getMedicalStatus()).isEqualTo(MedicalStatus.PENDENTE);
+					assertThat(passport.getManagerStatus()).isEqualTo(ManagerStatus.PENDENTE);
 				});
 	}
 
@@ -138,17 +137,17 @@ class ApiApplicationTests {
 						""".formatted(passport.getId())))
 				.andExpect(status().isCreated())
 				.andExpect(jsonPath("$.id", notNullValue()))
-				.andExpect(jsonPath("$.doucumentName").value("ASO"))
+				.andExpect(jsonPath("$.documentName").value("ASO"))
 				.andExpect(jsonPath("$.fileName").value("aso.pdf"))
 				.andExpect(jsonPath("$.fileType").value("application/pdf"))
-				.andExpect(jsonPath("$.status").value(ArtifactsStatus.PENDENTE.name()))
+				.andExpect(jsonPath("$.status").value(WorkflowStatus.ABERTA.name()))
 				.andExpect(jsonPath("$.passport.id").value(passport.getId().toString()));
 
 		assertThat(artifactRepository.findAll())
 				.singleElement()
 				.satisfies(artifact -> {
-					assertThat(artifact.getDoucumentName()).isEqualTo("ASO");
-					assertThat(artifact.getStatus()).isEqualTo(ArtifactsStatus.PENDENTE);
+					assertThat(artifact.getDocumentName()).isEqualTo("ASO");
+					assertThat(artifact.getStatus()).isEqualTo(WorkflowStatus.ABERTA);
 					assertThat(artifact.getPassport().getId()).isEqualTo(passport.getId());
 				});
 	}
@@ -161,7 +160,7 @@ class ApiApplicationTests {
 		mockMvc.perform(get("/api/artifacts/passport/{passportId}", passport.getId()))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$[0].id", notNullValue()))
-				.andExpect(jsonPath("$[0].status").value(ArtifactsStatus.PENDENTE.name()))
+				.andExpect(jsonPath("$[0].status").value(WorkflowStatus.ABERTA.name()))
 				.andExpect(jsonPath("$[0].passport.id").value(passport.getId().toString()));
 	}
 
@@ -171,13 +170,13 @@ class ApiApplicationTests {
 
 		mockMvc.perform(patch("/api/artifacts/validate/{id}", artifact.getId()))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.status").value(ArtifactsStatus.VALIDADO.name()))
+				.andExpect(jsonPath("$.status").value(WorkflowStatus.VALIDA.name()))
 				.andExpect(jsonPath("$.invalidationReason", nullValue()));
 
 		assertThat(artifactRepository.findById(artifact.getId()))
 				.get()
 				.extracting(Artifact::getStatus)
-				.isEqualTo(ArtifactsStatus.VALIDADO);
+				.isEqualTo(WorkflowStatus.VALIDA);
 	}
 
 	@Test
@@ -192,13 +191,13 @@ class ApiApplicationTests {
 						}
 						"""))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.status").value(ArtifactsStatus.INVALIDADO.name()))
+				.andExpect(jsonPath("$.status").value(WorkflowStatus.INVALIDA.name()))
 				.andExpect(jsonPath("$.invalidationReason").value("Documento ilegível"));
 
 		assertThat(artifactRepository.findById(artifact.getId()))
 				.get()
 				.satisfies(savedArtifact -> {
-					assertThat(savedArtifact.getStatus()).isEqualTo(ArtifactsStatus.INVALIDADO);
+					assertThat(savedArtifact.getStatus()).isEqualTo(WorkflowStatus.INVALIDA);
 					assertThat(savedArtifact.getInvalidationReason()).isEqualTo("Documento ilegível");
 				});
 	}
@@ -218,9 +217,9 @@ class ApiApplicationTests {
 		passport.setCandidateCpf("12345678900");
 		passport.setJobPosition("Analista de RH");
 		passport.setCreatedAt(LocalDate.now());
-		passport.setStatus(PassportStatus.ABERTA);
-		passport.setMedicalResult(MedicalResult.PENDENTE);
-		passport.setManagerDecision(ManagerDecision.PENDENTE);
+		passport.setStatus(WorkflowStatus.ABERTA);
+		passport.setMedicalStatus(MedicalStatus.PENDENTE);
+		passport.setManagerStatus(ManagerStatus.PENDENTE);
 
 		return passportRepository.save(passport);
 	}
@@ -228,11 +227,11 @@ class ApiApplicationTests {
 	private Artifact saveArtifact(Passport passport) {
 		Artifact artifact = new Artifact();
 		artifact.setPassport(passport);
-		artifact.setDoucumentName("ASO");
+		artifact.setDocumentName("ASO");
 		artifact.setFileName("aso.pdf");
 		artifact.setFileType("application/pdf");
 		artifact.setUploadDate(LocalDate.now());
-		artifact.setStatus(ArtifactsStatus.PENDENTE);
+		artifact.setStatus(WorkflowStatus.ABERTA);
 
 		return artifactRepository.save(artifact);
 	}

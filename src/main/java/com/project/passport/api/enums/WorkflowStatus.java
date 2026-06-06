@@ -1,7 +1,6 @@
 package com.project.passport.api.enums;
 
-public enum PassportStatus {
-
+public enum WorkflowStatus {
     VALIDA,
     ABERTA,
     INVALIDA,

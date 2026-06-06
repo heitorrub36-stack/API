@@ -11,22 +11,22 @@ import org.springframework.web.server.ResponseStatusException;
 import com.project.passport.api.dto.ManagerReviewDto;
 import com.project.passport.api.dto.MedicalReviewDto;
 import com.project.passport.api.dto.PassportDto;
-import com.project.passport.api.enums.ManagerDecision;
-import com.project.passport.api.enums.MedicalResult;
-import com.project.passport.api.enums.PassportStatus;
+import com.project.passport.api.enums.ManagerStatus;
+import com.project.passport.api.enums.MedicalStatus;
+import com.project.passport.api.enums.WorkflowStatus;
 import com.project.passport.api.model.Passport;
 import com.project.passport.api.repository.PassportRepository;
 
 @Service
 public class PassportService {
-    
+
     private final PassportRepository passportRepository;
 
     public PassportService(PassportRepository passportRepository) {
         this.passportRepository = passportRepository;
     }
 
-    public Passport createPassport(PassportDto dto){
+    public Passport createPassport(PassportDto dto) {
         validatePassportDto(dto);
 
         Passport passport = new Passport();
@@ -34,31 +34,31 @@ public class PassportService {
         passport.setCandidateCpf(dto.getCandidateCpf());
         passport.setJobPosition(dto.getJobPosition());
         passport.setCreatedAt(LocalDate.now());
-        passport.setStatus(PassportStatus.ABERTA);
-        passport.setMedicalResult(MedicalResult.PENDENTE);
-        passport.setManagerDecision(ManagerDecision.PENDENTE);
+        passport.setStatus(WorkflowStatus.ABERTA);
+        passport.setMedicalStatus(MedicalStatus.PENDENTE);
+        passport.setManagerStatus(ManagerStatus.PENDENTE);
 
         return passportRepository.save(passport);
     }
 
-    public List<Passport> getAllPassports(){
+    public List<Passport> getAllPassports() {
         return passportRepository.findAll();
     }
 
-    public Passport getPassportById(UUID id){
-       return passportRepository.findById(id)
-               .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Passport not found"));
+    public Passport getPassportById(UUID id) {
+        return passportRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Passport not found"));
     }
 
-    public Passport updateMedicalReview(UUID id, MedicalReviewDto dto){
-        if (dto == null || dto.getMedicalResult() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Medical result is required");
+    public Passport updateMedicalReview(UUID id, MedicalReviewDto dto) {
+        if (dto == null || dto.getMedicalStatus() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Medical status is required");
         }
 
         Passport passport = getPassportById(id);
         ensureNotCancelled(passport);
 
-        passport.setMedicalResult(dto.getMedicalResult());
+        passport.setMedicalStatus(dto.getMedicalStatus());
         passport.setMedicalNotes(dto.getMedicalNotes());
 
         updateStatus(passport);
@@ -66,16 +66,15 @@ public class PassportService {
         return passportRepository.save(passport);
     }
 
-
-     public Passport updateManagerReview(UUID id, ManagerReviewDto dto){
-        if (dto == null || dto.getManagerDecision() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Manager decision is required");
+    public Passport updateManagerReview(UUID id, ManagerReviewDto dto) {
+        if (dto == null || dto.getManagerStatus() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Manager status is required");
         }
 
         Passport passport = getPassportById(id);
         ensureNotCancelled(passport);
-        
-        passport.setManagerDecision(dto.getManagerDecision());
+
+        passport.setManagerStatus(dto.getManagerStatus());
         passport.setManagerNotes(dto.getManagerNotes());
 
         updateStatus(passport);
@@ -84,24 +83,24 @@ public class PassportService {
     }
 
     private void updateStatus(Passport passport) {
-        if (passport.getStatus() == PassportStatus.CANCELADA) {
+        if (passport.getStatus() == WorkflowStatus.CANCELADA) {
             return;
         }
 
-        if (passport.getMedicalResult() == MedicalResult.INAPTO
-                || passport.getManagerDecision() == ManagerDecision.REPROVADO) {
-            passport.setStatus(PassportStatus.INVALIDA);
-        } else if (passport.getMedicalResult() == MedicalResult.APTO
-                && passport.getManagerDecision() == ManagerDecision.APROVADO) {
-            passport.setStatus(PassportStatus.VALIDA);
+        if (passport.getMedicalStatus() == MedicalStatus.INAPTO
+                || passport.getManagerStatus() == ManagerStatus.REPROVADO) {
+            passport.setStatus(WorkflowStatus.INVALIDA);
+        } else if (passport.getMedicalStatus() == MedicalStatus.APTO
+                && passport.getManagerStatus() == ManagerStatus.APROVADO) {
+            passport.setStatus(WorkflowStatus.VALIDA);
         } else {
-            passport.setStatus(PassportStatus.ABERTA);
+            passport.setStatus(WorkflowStatus.ABERTA);
         }
     }
 
     public Passport cancelPassport(UUID id) {
         Passport passport = getPassportById(id);
-        passport.setStatus(PassportStatus.CANCELADA);
+        passport.setStatus(WorkflowStatus.CANCELADA);
         return passportRepository.save(passport);
     }
 
@@ -130,7 +129,7 @@ public class PassportService {
     }
 
     private void ensureNotCancelled(Passport passport) {
-        if (passport.getStatus() == PassportStatus.CANCELADA) {
+        if (passport.getStatus() == WorkflowStatus.CANCELADA) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Cancelled passport cannot be reviewed");
         }
     }

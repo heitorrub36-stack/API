@@ -1,23 +1,25 @@
 package com.project.passport.api.dto;
 
-import com.project.passport.api.enums.ManagerDecision;
+import com.project.passport.api.enums.ManagerStatus;
 
 public class ManagerReviewDto {
 
-    private ManagerDecision managerDecision;
+    private ManagerStatus managerStatus;
     private String managerNotes;
-    
-    public ManagerDecision getManagerDecision() {
-        return managerDecision;
+
+    public ManagerStatus getManagerStatus() {
+        return managerStatus;
     }
-    public void setManagerDecision(ManagerDecision managerDecision) {
-        this.managerDecision = managerDecision;
+
+    public void setManagerStatus(ManagerStatus managerStatus) {
+        this.managerStatus = managerStatus;
     }
+
     public String getManagerNotes() {
         return managerNotes;
     }
+
     public void setManagerNotes(String managerNotes) {
         this.managerNotes = managerNotes;
     }
-    
 }

@@ -51,11 +51,11 @@ async function loadDashboard() {
 
         document.getElementById("totalPassports").textContent = data.totalPassports;
         document.getElementById("pendingMedicalEvaluation").textContent = data.pendingMedicalEvaluation;
-        document.getElementById("fitWaitingManagerDecision").textContent = data.fitWaitingManagerDecision;
+        document.getElementById("fitWaitingManagerStatus").textContent = data.fitWaitingManagerStatus;
         document.getElementById("openPassports").textContent = data.openPassports;
         document.getElementById("validPassports").textContent = data.validPassports;
         document.getElementById("invalidPassports").textContent = data.invalidPassports;
-        document.getElementById("canceledPassports").textContent = data.cancelledPassports;
+        document.getElementById("canceledPassports").textContent = data.canceledPassports;
     } catch (error) {
         console.error("Erro ao carregar dashboard:", error);
     }
@@ -109,8 +109,8 @@ function renderRhTable() {
             <td>${passport.candidateName}</td>
             <td>${passport.candidateCpf}</td>
             <td>${passport.jobPosition}</td>
-            <td>${statusWithIcon(passport.medicalResult)}</td>
-            <td>${statusWithIcon(passport.managerDecision)}</td>
+            <td>${statusWithIcon(passport.medicalStatus)}</td>
+            <td>${statusWithIcon(passport.managerStatus)}</td>
             <td>${renderAttachmentSummary(artifacts)}</td>
             <td>
                 <span class="status ${getStatusClass(passport.status)}">
@@ -134,8 +134,8 @@ function renderDashboardTable() {
             <td>${passport.candidateName}</td>
             <td>${passport.candidateCpf}</td>
             <td>${passport.jobPosition}</td>
-            <td>${statusWithIcon(passport.medicalResult)}</td>
-            <td>${statusWithIcon(passport.managerDecision)}</td>
+            <td>${statusWithIcon(passport.medicalStatus)}</td>
+            <td>${statusWithIcon(passport.managerStatus)}</td>
             <td>
                 <span class="status ${getStatusClass(passport.status)}">
                     ${passport.status}
@@ -245,8 +245,8 @@ function showMedicalPassportDetails() {
     details.innerHTML = renderPassportDetails(selectedMedicalPassport);
     renderArtifactList("medicalArtifacts", getMedicalArtifacts(selectedMedicalPassport.id), "Nenhum anexo direcionado para Medicina.");
 
-    document.getElementById("medicalResult").value =
-        selectedMedicalPassport.medicalResult === "PENDENTE" ? "" : selectedMedicalPassport.medicalResult;
+    document.getElementById("medicalStatus").value =
+        selectedMedicalPassport.medicalStatus === "PENDENTE" ? "" : selectedMedicalPassport.medicalStatus;
 
     document.getElementById("medicalNotes").value =
         selectedMedicalPassport.medicalNotes || "";
@@ -265,8 +265,8 @@ function showManagerPassportDetails() {
     details.innerHTML = renderPassportDetails(selectedManagerPassport);
     renderArtifactList("managerArtifacts", getManagerArtifacts(selectedManagerPassport.id), "Nenhum anexo direcionado para Gerente.");
 
-    document.getElementById("managerDecision").value =
-        selectedManagerPassport.managerDecision === "PENDENTE" ? "" : selectedManagerPassport.managerDecision;
+    document.getElementById("managerStatus").value =
+        selectedManagerPassport.managerStatus === "PENDENTE" ? "" : selectedManagerPassport.managerStatus;
 
     document.getElementById("managerNotes").value =
         selectedManagerPassport.managerNotes || "";
@@ -282,9 +282,9 @@ function renderPassportDetails(passport) {
                 ${passport.status}
             </span>
         </p>
-        <p><strong>Resultado medico:</strong> ${statusWithIcon(passport.medicalResult)}</p>
+        <p><strong>Resultado medico:</strong> ${statusWithIcon(passport.medicalStatus)}</p>
         <p><strong>Observacao medica:</strong> ${passport.medicalNotes || "Sem observacoes"}</p>
-        <p><strong>Decisao do gerente:</strong> ${statusWithIcon(passport.managerDecision)}</p>
+        <p><strong>Decisao do gerente:</strong> ${statusWithIcon(passport.managerStatus)}</p>
         <p><strong>Observacao do gerente:</strong> ${passport.managerNotes || "Sem observacoes"}</p>
     `;
 }
@@ -314,7 +314,7 @@ function renderArtifact(artifact) {
             <div class="artifact-heading">
                 <span class="artifact-icon ${getArtifactStatusClass(artifact.status)}">${getArtifactIcon(artifact.status)}</span>
                 <div>
-                    <strong>${artifact.doucumentName}</strong>
+                    <strong>${artifact.documentName}</strong>
                     <span>${artifact.fileName} - ${artifact.fileType}</span>
                 </div>
             </div>
@@ -362,7 +362,7 @@ async function updateMedicalReview(event) {
     }
 
     const body = {
-        medicalResult: document.getElementById("medicalResult").value,
+        medicalStatus: document.getElementById("medicalStatus").value,
         medicalNotes: document.getElementById("medicalNotes").value
     };
 
@@ -400,7 +400,7 @@ async function updateManagerReview(event) {
     }
 
     const body = {
-        managerDecision: document.getElementById("managerDecision").value,
+        managerStatus: document.getElementById("managerStatus").value,
         managerNotes: document.getElementById("managerNotes").value
     };
 
@@ -571,8 +571,8 @@ function renderAttachmentSummary(artifacts) {
         return `<span class="required-warning">! Pendente</span>`;
     }
 
-    const valid = artifacts.filter(artifact => artifact.status === "VALIDADO").length;
-    const invalid = artifacts.filter(artifact => artifact.status === "INVALIDADO").length;
+    const valid = artifacts.filter(artifact => artifact.status === "VALIDA").length;
+    const invalid = artifacts.filter(artifact => artifact.status === "INVALIDA").length;
     const pending = artifacts.length - valid - invalid;
 
     return `
@@ -596,11 +596,11 @@ function statusWithIcon(value) {
 }
 
 function getArtifactIcon(status) {
-    if (status === "VALIDADO") {
+    if (status === "VALIDA") {
         return "✓";
     }
 
-    if (status === "INVALIDADO") {
+    if (status === "INVALIDA") {
         return "×";
     }
 
@@ -608,11 +608,11 @@ function getArtifactIcon(status) {
 }
 
 function getArtifactStatusClass(status) {
-    if (status === "VALIDADO") {
+    if (status === "VALIDA") {
         return "artifact-valid valid";
     }
 
-    if (status === "INVALIDADO") {
+    if (status === "INVALIDA") {
         return "artifact-invalid invalid";
     }
 

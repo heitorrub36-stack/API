@@ -14,11 +14,11 @@ async function loadDashboard() {
 
         document.getElementById("totalPassports").textContent = data.totalPassports;
         document.getElementById("pendingMedicalEvaluation").textContent = data.pendingMedicalEvaluation;
-        document.getElementById("fitWaitingManagerDecision").textContent = data.fitWaitingManagerDecision;
+        document.getElementById("fitWaitingManagerStatus").textContent = data.fitWaitingManagerStatus;
         document.getElementById("openPassports").textContent = data.openPassports;
         document.getElementById("validPassports").textContent = data.validPassports;
         document.getElementById("invalidPassports").textContent = data.invalidPassports;
-        document.getElementById("canceledPassports").textContent = data.cancelledPassports;
+        document.getElementById("canceledPassports").textContent = data.canceledPassports;
     } catch (error) {
         console.error("Erro ao carregar dashboard:", error);
     }
@@ -46,8 +46,8 @@ async function renderPassportRow(passport) {
         <td>${passport.candidateName}</td>
         <td>${passport.candidateCpf}</td>
         <td>${passport.jobPosition}</td>
-        <td>${statusWithIcon(passport.medicalResult)}</td>
-        <td>${statusWithIcon(passport.managerDecision)}</td>
+        <td>${statusWithIcon(passport.medicalStatus)}</td>
+        <td>${statusWithIcon(passport.managerStatus)}</td>
         <td>${renderAttachmentSummary(artifacts)}</td>
         <td>
             <span class="status ${getStatusClass(passport.status)}">
@@ -172,8 +172,8 @@ function renderAttachmentSummary(artifacts) {
         return `<span class="required-warning">! Pendente</span>`;
     }
 
-    const valid = artifacts.filter(artifact => artifact.status === "VALIDADO").length;
-    const invalid = artifacts.filter(artifact => artifact.status === "INVALIDADO").length;
+    const valid = artifacts.filter(artifact => artifact.status === "VALIDA").length;
+    const invalid = artifacts.filter(artifact => artifact.status === "INVALIDA").length;
     const pending = artifacts.length - valid - invalid;
 
     return `

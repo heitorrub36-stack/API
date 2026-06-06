@@ -4,26 +4,25 @@ public class DashboardDto {
 
     private long totalPassports;
     private long pendingMedicalEvaluation;
-    private long fitWaitingManagerDecision;
+    private long fitWaitingManagerStatus;
 
     private long openPassports;
     private long validPassports;
     private long invalidPassports;
-    private long cancelledPassports;
+    private long canceledPassports;
 
-    public DashboardDto(){
-
+    public DashboardDto() {
     }
 
-    public DashboardDto(long totalPassports, long pendingMedicalEvaluation, long fitWaitingManagerDecision,
-            long openPassports, long validPassports, long invalidPassports, long cancelledPassports) {
+    public DashboardDto(long totalPassports, long pendingMedicalEvaluation, long fitWaitingManagerStatus,
+            long openPassports, long validPassports, long invalidPassports, long canceledPassports) {
         this.totalPassports = totalPassports;
         this.pendingMedicalEvaluation = pendingMedicalEvaluation;
-        this.fitWaitingManagerDecision = fitWaitingManagerDecision;
+        this.fitWaitingManagerStatus = fitWaitingManagerStatus;
         this.openPassports = openPassports;
         this.validPassports = validPassports;
         this.invalidPassports = invalidPassports;
-        this.cancelledPassports = cancelledPassports;
+        this.canceledPassports = canceledPassports;
     }
 
     public long getTotalPassports() {
@@ -42,20 +41,12 @@ public class DashboardDto {
         this.pendingMedicalEvaluation = pendingMedicalEvaluation;
     }
 
-    public long getPendingMedicalRvaluation() {
-        return pendingMedicalEvaluation;
+    public long getFitWaitingManagerStatus() {
+        return fitWaitingManagerStatus;
     }
 
-    public void setPendingMedicalRvaluation(long pendingMedicalRvaluation) {
-        this.pendingMedicalEvaluation = pendingMedicalRvaluation;
-    }
-
-    public long getFitWaitingManagerDecision() {
-        return fitWaitingManagerDecision;
-    }
-
-    public void setFitWaitingManagerDecision(long fitWaitingManagerDecision) {
-        this.fitWaitingManagerDecision = fitWaitingManagerDecision;
+    public void setFitWaitingManagerStatus(long fitWaitingManagerStatus) {
+        this.fitWaitingManagerStatus = fitWaitingManagerStatus;
     }
 
     public long getOpenPassports() {
@@ -82,17 +73,11 @@ public class DashboardDto {
         this.invalidPassports = invalidPassports;
     }
 
-    public long getCancelledPassports() {
-        return cancelledPassports;
+    public long getCanceledPassports() {
+        return canceledPassports;
     }
 
-    public void setCancelledPassports(long cancelledPassports) {
-        this.cancelledPassports = cancelledPassports;
+    public void setCanceledPassports(long canceledPassports) {
+        this.canceledPassports = canceledPassports;
     }
-
-    
-    
-
-
-    
 }
