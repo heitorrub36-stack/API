@@ -3,7 +3,6 @@ package com.project.passport.api.model;
 import java.time.LocalDate;
 import java.util.UUID;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.project.passport.api.enums.ArtifactsStatus;
 
 import jakarta.persistence.Column;
