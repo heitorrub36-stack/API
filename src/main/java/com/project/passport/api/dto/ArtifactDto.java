@@ -5,6 +5,8 @@ import java.util.UUID;
 public class ArtifactDto {
 
     private UUID passportId;
+    private UUID taskId;
+    private UUID subtaskId;
     private String documentName;
     private String fileName;
     private String fileType;
@@ -17,6 +19,18 @@ public class ArtifactDto {
     }
     public void setPassportId(UUID passportId) {
         this.passportId = passportId;
+    }
+    public UUID getTaskId() {
+        return taskId;
+    }
+    public void setTaskId(UUID taskId) {
+        this.taskId = taskId;
+    }
+    public UUID getSubtaskId() {
+        return subtaskId;
+    }
+    public void setSubtaskId(UUID subtaskId) {
+        this.subtaskId = subtaskId;
     }
     public String getDocumentName() {
         return documentName;

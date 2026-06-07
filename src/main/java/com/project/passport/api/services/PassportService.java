@@ -17,6 +17,7 @@ import com.project.passport.api.enums.UserRole;
 import com.project.passport.api.enums.WorkflowStatus;
 import com.project.passport.api.model.AppUser;
 import com.project.passport.api.model.Passport;
+import com.project.passport.api.model.PassportProfile;
 import com.project.passport.api.repository.PassportRepository;
 
 @Service
@@ -24,16 +25,29 @@ public class PassportService {
 
     private final PassportRepository passportRepository;
     private final AppUserService appUserService;
+    private final PassportProfileService passportProfileService;
+    private final WorkflowService workflowService;
 
-    public PassportService(PassportRepository passportRepository, AppUserService appUserService) {
+    public PassportService(PassportRepository passportRepository, AppUserService appUserService, PassportProfileService passportProfileService, WorkflowService workflowService) {
         this.passportRepository = passportRepository;
         this.appUserService = appUserService;
+        this.passportProfileService = passportProfileService;
+        this.workflowService = workflowService;
     }
 
     public Passport createPassport(PassportDto dto) {
         validatePassportDto(dto);
 
         Passport passport = new Passport();
+
+        if (dto.getProfileId() != null) {
+            PassportProfile profile = passportProfileService.getProfileById(dto.getProfileId());
+            if (Boolean.FALSE.equals(profile.getActive())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Passport profile is inactive");
+            }
+            passport.setProfile(profile);
+        }
+
         passport.setCandidateName(dto.getCandidateName());
         passport.setCandidateCpf(dto.getCandidateCpf());
         passport.setJobPosition(dto.getJobPosition());
@@ -48,7 +62,9 @@ public class PassportService {
             passport.setCreatedByRh(rhUser);
         }
 
-        return passportRepository.save(passport);
+        Passport savedPassport = passportRepository.save(passport);
+        workflowService.generateDefaultWorkflow(savedPassport);
+        return savedPassport;
     }
 
 

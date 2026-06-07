@@ -13,6 +13,8 @@ public class PassportDto {
 
     private UUID createdByRh;
 
+    private UUID profileId;
+
     public String getCandidateName() {
         return candidateName;
     }
@@ -41,8 +43,16 @@ public class PassportDto {
         return createdByRh;
     }
 
+    public UUID getProfileId() {
+        return profileId;
+    }
+
     public void setCreatedByRh(UUID createdByRh) {
         this.createdByRh = createdByRh;
+    }
+
+    public void setProfileId(UUID profileId) {
+        this.profileId = profileId;
     }
 
 
