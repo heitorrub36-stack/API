@@ -1,7 +1,7 @@
 package com.project.passport.api.model;
 
 import com.project.passport.api.enums.UserRole;
-import com.project.passport.api.enums.WorkflowStatus;
+import com.project.passport.api.enums.ProcessStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -32,7 +32,7 @@ public class PassportActivity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private WorkflowStatus status;
+    private ProcessStatus status;
 
     @Enumerated(EnumType.STRING)
     private UserRole responsibleRole;
@@ -60,9 +60,9 @@ public class PassportActivity {
 
     public void setOrderNumber(Integer orderNumber) { this.orderNumber = orderNumber; }
 
-    public WorkflowStatus getStatus() { return status; }
+    public ProcessStatus getStatus() { return status; }
 
-    public void setStatus(WorkflowStatus status) { this.status = status; }
+    public void setStatus(ProcessStatus status) { this.status = status; }
 
     public UserRole getResponsibleRole() { return responsibleRole; }
 

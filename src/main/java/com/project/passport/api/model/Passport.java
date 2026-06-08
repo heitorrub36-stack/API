@@ -2,7 +2,7 @@ package com.project.passport.api.model;
 
 import com.project.passport.api.enums.ManagerStatus;
 import com.project.passport.api.enums.MedicalStatus;
-import com.project.passport.api.enums.WorkflowStatus;
+import com.project.passport.api.enums.ProcessStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -46,7 +46,7 @@ public class Passport {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private WorkflowStatus status;
+    private ProcessStatus status;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -93,8 +93,8 @@ public class Passport {
     public void setCandidateAccessKey(String candidateAccessKey) { this.candidateAccessKey = candidateAccessKey; }
     public LocalDate getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDate createdAt) { this.createdAt = createdAt; }
-    public WorkflowStatus getStatus() { return status; }
-    public void setStatus(WorkflowStatus status) { this.status = status; }
+    public ProcessStatus getStatus() { return status; }
+    public void setStatus(ProcessStatus status) { this.status = status; }
     public MedicalStatus getMedicalStatus() { return medicalStatus; }
     public void setMedicalStatus(MedicalStatus medicalStatus) { this.medicalStatus = medicalStatus; }
     public String getMedicalNotes() { return medicalNotes; }

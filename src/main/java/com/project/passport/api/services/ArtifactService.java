@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.project.passport.api.dto.ArtifactDto;
-import com.project.passport.api.enums.WorkflowStatus;
+import com.project.passport.api.enums.ProcessStatus;
 import com.project.passport.api.model.Artifact;
 import com.project.passport.api.model.PassportActivity;
 import com.project.passport.api.model.PassportTask;
@@ -21,11 +21,11 @@ import com.project.passport.api.repository.ArtifactRepository;
 public class ArtifactService {
 
     private final ArtifactRepository artifactRepository;
-    private final WorkflowService workflowService;
+    private final PassportFlowService passportFlowService;
 
-    public ArtifactService(ArtifactRepository artifactRepository, WorkflowService workflowService) {
+    public ArtifactService(ArtifactRepository artifactRepository, PassportFlowService passportFlowService) {
         this.artifactRepository = artifactRepository;
-        this.workflowService = workflowService;
+        this.passportFlowService = passportFlowService;
     }
 
     public Artifact createArtifact(ArtifactDto artifactDto) {
@@ -37,20 +37,20 @@ public class ArtifactService {
         artifact.setFileType(artifactDto.getFileType());
         artifact.setNotes(artifactDto.getNotes());
         artifact.setUploadDate(LocalDate.now());
-        artifact.setStatus(WorkflowStatus.ABERTA);
+        artifact.setStatus(ProcessStatus.ABERTA);
 
         if (artifactDto.getActivityId() != null) {
-            PassportActivity activity = workflowService.getActivityById(artifactDto.getActivityId());
+            PassportActivity activity = passportFlowService.getActivityById(artifactDto.getActivityId());
             artifact.setActivity(activity);
         } else if (artifactDto.getTaskId() != null) {
-            PassportTask task = workflowService.getTaskById(artifactDto.getTaskId());
+            PassportTask task = passportFlowService.getTaskById(artifactDto.getTaskId());
             artifact.setTask(task);
         } else if (artifactDto.getSubtaskId() != null) {
-            PassportSubtask subtask = workflowService.getSubtaskById(artifactDto.getSubtaskId());
+            PassportSubtask subtask = passportFlowService.getSubtaskById(artifactDto.getSubtaskId());
             artifact.setSubtask(subtask);
         } else if (artifactDto.getPassportId() != null) {
-            // Compatibilidade com a tela atual: se só vier passportId, vincula ao primeiro task do workflow padrão.
-            PassportTask firstTask = workflowService.findFirstTaskByPassport(artifactDto.getPassportId());
+            // Compatibilidade com a tela atual: se só vier passportId, vincula ao primeiro task do fluxo de etapas padrão.
+            PassportTask firstTask = passportFlowService.findFirstTaskByPassport(artifactDto.getPassportId());
             artifact.setTask(firstTask);
         }
 
@@ -67,7 +67,7 @@ public class ArtifactService {
 
     public Artifact validateArtifact(UUID id) {
         Artifact artifact = getArtifactById(id);
-        artifact.setStatus(WorkflowStatus.VALIDA);
+        artifact.setStatus(ProcessStatus.VALIDA);
         artifact.setInvalidationReason(null);
         return artifactRepository.save(artifact);
     }
@@ -78,10 +78,15 @@ public class ArtifactService {
         }
 
         Artifact artifact = getArtifactById(id);
-        artifact.setStatus(WorkflowStatus.INVALIDA);
+        artifact.setStatus(ProcessStatus.INVALIDA);
         artifact.setInvalidationReason(reason);
 
         return artifactRepository.save(artifact);
+    }
+
+    public void deleteArtifact(UUID id) {
+        Artifact artifact = getArtifactById(id);
+        artifactRepository.delete(artifact);
     }
 
     public Artifact getArtifactById(UUID id) {
@@ -102,7 +107,7 @@ public class ArtifactService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Artifact must be linked to a passport, activity, task or subtask");
         }
         if (artifactDto.getPassportId() == null && targets > 1) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Artifact must be linked to only one workflow target");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Artifact must be linked to only one step target");
         }
         if (isBlank(artifactDto.getDocumentName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Document name is required");

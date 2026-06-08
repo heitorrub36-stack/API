@@ -1,6 +1,6 @@
 package com.project.passport.api.model;
 
-import com.project.passport.api.enums.WorkflowStatus;
+import com.project.passport.api.enums.ProcessStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -38,7 +38,7 @@ public class Artifact {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private WorkflowStatus status;
+    private ProcessStatus status;
 
     private String invalidationReason;
 
@@ -69,8 +69,8 @@ public class Artifact {
     public void setNotes(String notes) { this.notes = notes; }
     public LocalDate getUploadDate() { return uploadDate; }
     public void setUploadDate(LocalDate uploadDate) { this.uploadDate = uploadDate; }
-    public WorkflowStatus getStatus() { return status; }
-    public void setStatus(WorkflowStatus status) { this.status = status; }
+    public ProcessStatus getStatus() { return status; }
+    public void setStatus(ProcessStatus status) { this.status = status; }
     public String getInvalidationReason() { return invalidationReason; }
     public void setInvalidationReason(String invalidationReason) { this.invalidationReason = invalidationReason; }
     public PassportActivity getActivity() { return activity; }

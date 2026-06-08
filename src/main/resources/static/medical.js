@@ -1,7 +1,7 @@
 let users = [];
 let passports = [];
 let selectedPassport = null;
-let workflow = [];
+let processFlow = [];
 let artifacts = [];
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -23,10 +23,10 @@ async function refreshPage() {
 async function selectPassport(event) { selectedPassport = passports.find(p => p.id === event.target.value) || null; await refreshSelectedData(); }
 
 async function refreshSelectedData() {
-  if (!selectedPassport) { passportDetails.innerHTML = `<p>Selecione um passaporte.</p>`; medicalArtifacts.innerHTML = `<p class="empty-cell">Nenhum passaporte selecionado.</p>`; medicalWorkflow.innerHTML = `<p class="empty-cell">Nenhum passaporte selecionado.</p>`; return; }
-  workflow = await loadWorkflowTree(selectedPassport.id);
+  if (!selectedPassport) { passportDetails.innerHTML = `<p>Selecione um passaporte.</p>`; medicalArtifacts.innerHTML = `<p class="empty-cell">Nenhum passaporte selecionado.</p>`; medicalProcessFlow.innerHTML = `<p class="empty-cell">Nenhum passaporte selecionado.</p>`; return; }
+  processFlow = await loadProcessFlowTree(selectedPassport.id);
   artifacts = await loadArtifactsByPassport(selectedPassport.id);
-  renderDetails(); renderArtifacts(); renderWorkflow();
+  renderDetails(); renderArtifacts(); renderProcessFlow();
 }
 
 function renderDetails() {
@@ -42,10 +42,10 @@ function renderArtifacts() {
   attachSignatureHandlers(medicalArtifacts, "medicalReviewer", refreshSelectedData);
 }
 
-function renderWorkflow() {
-  const tree = workflow.filter(a => a.responsibleRole === "MEDICINA_TRABALHO" || (a.tasks || []).some(t => t.responsibleRole === "MEDICINA_TRABALHO"));
-  medicalWorkflow.innerHTML = renderWorkflowTree(tree.length ? tree : workflow, { canSign: true });
-  attachSignatureHandlers(medicalWorkflow, "medicalReviewer", refreshSelectedData);
+function renderProcessFlow() {
+  const tree = processFlow.filter(a => a.responsibleRole === "MEDICINA_TRABALHO" || (a.tasks || []).some(t => t.responsibleRole === "MEDICINA_TRABALHO"));
+  medicalProcessFlow.innerHTML = renderProcessFlowTree(tree.length ? tree : processFlow, { canSign: true });
+  attachSignatureHandlers(medicalProcessFlow, "medicalReviewer", refreshSelectedData);
 }
 
 async function saveMedicalReview(event) {

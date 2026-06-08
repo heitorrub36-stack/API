@@ -110,13 +110,13 @@ async function loadDashboard() { return api("/dashboard"); }
 async function loadCategories() { return api("/document-categories"); }
 async function loadPassportByAccessKey(key) { return api(`/passports/access/${encodeURIComponent(key.trim().toUpperCase())}`); }
 
-async function loadWorkflowTree(passportId) {
+async function loadProcessFlowTree(passportId) {
   if (!passportId) return [];
-  const activities = await api(`/workflow/passports/${passportId}/activities`);
+  const activities = await api(`/passport-flow/passports/${passportId}/activities`);
   for (const activity of activities) {
-    activity.tasks = await api(`/workflow/activities/${activity.id}/tasks`);
+    activity.tasks = await api(`/passport-flow/activities/${activity.id}/tasks`);
     for (const task of activity.tasks) {
-      task.subtasks = await api(`/workflow/tasks/${task.id}/subtasks`);
+      task.subtasks = await api(`/passport-flow/tasks/${task.id}/subtasks`);
     }
   }
   return activities;
@@ -127,9 +127,9 @@ async function loadArtifactsByPassport(passportId) {
   return api(`/artifacts/passport/${passportId}`);
 }
 
-function flattenWorkflow(workflow) {
+function flattenProcessFlow(processFlow) {
   const items = [];
-  workflow.forEach(activity => {
+  processFlow.forEach(activity => {
     items.push({ kind: "activities", targetType: "ACTIVITY", id: activity.id, label: activity.name, level: 0, responsibleRole: activity.responsibleRole });
     (activity.tasks || []).forEach(task => {
       items.push({ kind: "tasks", targetType: "TASK", id: task.id, label: task.name, level: 1, responsibleRole: task.responsibleRole });
@@ -141,26 +141,26 @@ function flattenWorkflow(workflow) {
   return items;
 }
 
-function renderWorkflowTree(workflow, options = {}) {
-  if (!workflow || !workflow.length) return `<p class="empty-cell">Nenhuma atividade cadastrada para este passaporte.</p>`;
-  return workflow.map(activity => `
-    <article class="workflow-card activity-card">
-      <div class="workflow-head">
+function renderProcessFlowTree(processFlow, options = {}) {
+  if (!processFlow || !processFlow.length) return `<p class="empty-cell">Nenhuma atividade cadastrada para este passaporte.</p>`;
+  return processFlow.map(activity => `
+    <article class="step-card activity-card">
+      <div class="step-head">
         <div><strong>${escapeHtml(activity.orderNumber || "")}. ${escapeHtml(activity.name)}</strong><span>${escapeHtml(activity.description || "")}</span></div>
-        <div class="workflow-actions">${statusBadge(activity.status)}<small>${roleLabel(activity.responsibleRole)}</small>${options.mutable ? workflowStatusButtons("activities", activity.id) : ""}</div>
+        <div class="step-actions">${statusBadge(activity.status)}<small>${roleLabel(activity.responsibleRole)}</small>${options.mutable ? stepStatusButtons("activities", activity.id) : ""}</div>
       </div>
-      <div class="workflow-children">
+      <div class="step-children">
         ${(activity.tasks || []).map(task => `
-          <div class="workflow-card task-card">
-            <div class="workflow-head">
+          <div class="step-card task-card">
+            <div class="step-head">
               <div><strong>${escapeHtml(task.orderNumber || "")}. ${escapeHtml(task.name)}</strong><span>${escapeHtml(task.description || "")}</span><small>Prazo: ${formatDate(task.deadline)}</small></div>
-              <div class="workflow-actions">${statusBadge(task.status)}<small>${roleLabel(task.responsibleRole)}</small>${options.mutable ? workflowStatusButtons("tasks", task.id) : ""}${options.canSign ? `<button type="button" class="mini-button" data-sign="TASK" data-id="${task.id}">Assinar</button>` : ""}</div>
+              <div class="step-actions">${statusBadge(task.status)}<small>${roleLabel(task.responsibleRole)}</small>${options.mutable ? stepStatusButtons("tasks", task.id) : ""}${options.canSign ? `<button type="button" class="mini-button" data-sign="TASK" data-id="${task.id}">Assinar</button>` : ""}</div>
             </div>
             <div class="subtask-list">
               ${(task.subtasks || []).map(subtask => `
                 <div class="subtask-row">
                   <div><strong>${escapeHtml(subtask.name)}</strong><span>${escapeHtml(subtask.description || "")}</span><small>Prazo: ${formatDate(subtask.deadline)} · ${roleLabel(subtask.responsibleRole)}</small></div>
-                  <div class="workflow-actions">${statusBadge(subtask.status)}${options.mutable ? workflowStatusButtons("subtasks", subtask.id) : ""}${options.canSign ? `<button type="button" class="mini-button" data-sign="SUBTASK" data-id="${subtask.id}">Assinar</button>` : ""}</div>
+                  <div class="step-actions">${statusBadge(subtask.status)}${options.mutable ? stepStatusButtons("subtasks", subtask.id) : ""}${options.canSign ? `<button type="button" class="mini-button" data-sign="SUBTASK" data-id="${subtask.id}">Assinar</button>` : ""}</div>
                 </div>`).join("") || `<p class="empty-cell small-empty">Sem subtarefas.</p>`}
             </div>
           </div>`).join("") || `<p class="empty-cell small-empty">Sem tarefas.</p>`}
@@ -168,18 +168,18 @@ function renderWorkflowTree(workflow, options = {}) {
     </article>`).join("");
 }
 
-function workflowStatusButtons(kind, id) {
-  return `<button type="button" class="mini-button" data-workflow-kind="${kind}" data-workflow-id="${id}" data-workflow-status="VALIDA">Válida</button><button type="button" class="mini-button danger-text" data-workflow-kind="${kind}" data-workflow-id="${id}" data-workflow-status="INVALIDA">Inválida</button>`;
+function stepStatusButtons(kind, id) {
+  return `<button type="button" class="mini-button" data-step-kind="${kind}" data-step-id="${id}" data-step-status="VALIDA">Válida</button><button type="button" class="mini-button danger-text" data-step-kind="${kind}" data-step-id="${id}" data-step-status="INVALIDA">Inválida</button>`;
 }
 
-async function updateWorkflowStatus(kind, id, status) {
-  return api(`/workflow/${kind}/${id}/status`, { method: "PATCH", body: JSON.stringify({ status }) });
+async function updateStepStatus(kind, id, status) {
+  return api(`/passport-flow/${kind}/${id}/status`, { method: "PATCH", body: JSON.stringify({ status }) });
 }
 
-function attachWorkflowHandlers(container, refresh) {
-  container.querySelectorAll("[data-workflow-kind]").forEach(button => {
+function attachStepHandlers(container, refresh) {
+  container.querySelectorAll("[data-step-kind]").forEach(button => {
     button.addEventListener("click", async () => {
-      await updateWorkflowStatus(button.dataset.workflowKind, button.dataset.workflowId, button.dataset.workflowStatus);
+      await updateStepStatus(button.dataset.stepKind, button.dataset.stepId, button.dataset.stepStatus);
       await refresh();
     });
   });
@@ -235,7 +235,7 @@ function artifactTargetLabel(artifact) {
   if (artifact.subtask) return `Subtarefa: ${artifact.subtask.name}`;
   if (artifact.task) return `Tarefa: ${artifact.task.name}`;
   if (artifact.activity) return `Atividade: ${artifact.activity.name}`;
-  return "Workflow";
+  return "Fluxo de etapas";
 }
 
 function renderArtifactCard(artifact, options = {}) {
@@ -250,11 +250,13 @@ function renderArtifactCard(artifact, options = {}) {
         ${options.canForward ? `<button type="button" class="ghost-button" data-forward-artifact="MEDICINA" data-artifact-id="${artifact.id}">Enviar para Medicina</button><button type="button" class="ghost-button" data-forward-artifact="GERENTE" data-artifact-id="${artifact.id}">Enviar para Gerente</button>` : ""}
         ${options.canValidate ? `<button type="button" class="ghost-button" data-validate-artifact="${artifact.id}">Validar</button><button type="button" class="ghost-button danger-text" data-invalidate-artifact="${artifact.id}">Invalidar</button>` : ""}
         ${options.canSign ? `<button type="button" class="ghost-button" data-sign="ARTIFACT" data-id="${artifact.id}">Assinar</button>` : ""}
+        ${options.canDelete ? `<button type="button" class="ghost-button danger-text" data-delete-artifact="${artifact.id}">Excluir</button>` : ""}
       </div>
     </article>`;
 }
 
 async function validateArtifact(id) { return api(`/artifacts/validate/${id}`, { method: "PATCH" }); }
+async function deleteArtifact(id) { return api(`/artifacts/${id}`, { method: "DELETE" }); }
 async function invalidateArtifact(id, reason) { return api(`/artifacts/${id}/invalidate`, { method: "PATCH", body: JSON.stringify({ reason }) }); }
 async function signTarget(signedByUserId, targetType, targetId) { return api("/signatures", { method: "POST", body: JSON.stringify({ signedByUserId, targetType, targetId }) }); }
 
@@ -262,6 +264,12 @@ function attachArtifactHandlers(container, onRefresh) {
   container.querySelectorAll("[data-open-artifact]").forEach(btn => btn.addEventListener("click", () => openArtifact(btn.dataset.openArtifact)));
   container.querySelectorAll("[data-validate-artifact]").forEach(btn => btn.addEventListener("click", async () => { await validateArtifact(btn.dataset.validateArtifact); await onRefresh(); }));
   container.querySelectorAll("[data-invalidate-artifact]").forEach(btn => btn.addEventListener("click", async () => { const reason = prompt("Motivo da invalidação:"); if (reason) { await invalidateArtifact(btn.dataset.invalidateArtifact, reason); await onRefresh(); } }));
+  container.querySelectorAll("[data-delete-artifact]").forEach(btn => btn.addEventListener("click", async () => {
+    if (!confirm("Excluir este documento do passaporte?")) return;
+    await deleteArtifact(btn.dataset.deleteArtifact);
+    localStorage.removeItem(`artifact-file-${btn.dataset.deleteArtifact}`);
+    await onRefresh();
+  }));
 }
 
 function attachSignatureHandlers(container, reviewerSelectId, onRefresh) {

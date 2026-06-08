@@ -14,7 +14,7 @@ import com.project.passport.api.dto.PassportDto;
 import com.project.passport.api.enums.ManagerStatus;
 import com.project.passport.api.enums.MedicalStatus;
 import com.project.passport.api.enums.UserRole;
-import com.project.passport.api.enums.WorkflowStatus;
+import com.project.passport.api.enums.ProcessStatus;
 import com.project.passport.api.model.AppUser;
 import com.project.passport.api.model.Passport;
 import com.project.passport.api.model.PassportProfile;
@@ -26,13 +26,13 @@ public class PassportService {
     private final PassportRepository passportRepository;
     private final AppUserService appUserService;
     private final PassportProfileService passportProfileService;
-    private final WorkflowService workflowService;
+    private final PassportFlowService passportFlowService;
 
-    public PassportService(PassportRepository passportRepository, AppUserService appUserService, PassportProfileService passportProfileService, WorkflowService workflowService) {
+    public PassportService(PassportRepository passportRepository, AppUserService appUserService, PassportProfileService passportProfileService, PassportFlowService passportFlowService) {
         this.passportRepository = passportRepository;
         this.appUserService = appUserService;
         this.passportProfileService = passportProfileService;
-        this.workflowService = workflowService;
+        this.passportFlowService = passportFlowService;
     }
 
     public Passport createPassport(PassportDto dto) {
@@ -56,7 +56,7 @@ public class PassportService {
         passport.setJobPosition(dto.getJobPosition());
         passport.setCandidateAccessKey(generateCandidateAccessKey());
         passport.setCreatedAt(LocalDate.now());
-        passport.setStatus(WorkflowStatus.ABERTA);
+        passport.setStatus(ProcessStatus.ABERTA);
         passport.setMedicalStatus(MedicalStatus.PENDENTE);
         passport.setManagerStatus(ManagerStatus.PENDENTE);
 
@@ -67,7 +67,7 @@ public class PassportService {
         }
 
         Passport savedPassport = passportRepository.save(passport);
-        workflowService.generateDefaultWorkflow(savedPassport);
+        passportFlowService.generateDefaultProcessSteps(savedPassport);
         return savedPassport;
     }
 
@@ -135,24 +135,24 @@ public class PassportService {
     }
 
     private void updateStatus(Passport passport) {
-        if (passport.getStatus() == WorkflowStatus.CANCELADA) {
+        if (passport.getStatus() == ProcessStatus.CANCELADA) {
             return;
         }
 
         if (passport.getMedicalStatus() == MedicalStatus.INAPTO
                 || passport.getManagerStatus() == ManagerStatus.REPROVADO) {
-            passport.setStatus(WorkflowStatus.INVALIDA);
+            passport.setStatus(ProcessStatus.INVALIDA);
         } else if (passport.getMedicalStatus() == MedicalStatus.APTO
                 && passport.getManagerStatus() == ManagerStatus.APROVADO) {
-            passport.setStatus(WorkflowStatus.VALIDA);
+            passport.setStatus(ProcessStatus.VALIDA);
         } else {
-            passport.setStatus(WorkflowStatus.ABERTA);
+            passport.setStatus(ProcessStatus.ABERTA);
         }
     }
 
     public Passport cancelPassport(UUID id) {
         Passport passport = getPassportById(id);
-        passport.setStatus(WorkflowStatus.CANCELADA);
+        passport.setStatus(ProcessStatus.CANCELADA);
         return passportRepository.save(passport);
     }
 
@@ -195,7 +195,7 @@ public class PassportService {
     }
 
     private void ensureNotCancelled(Passport passport) {
-        if (passport.getStatus() == WorkflowStatus.CANCELADA) {
+        if (passport.getStatus() == ProcessStatus.CANCELADA) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Cancelled passport cannot be reviewed");
         }
     }

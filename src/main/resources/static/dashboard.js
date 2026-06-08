@@ -22,7 +22,7 @@ async function refreshDashboard() {
     renderCards(dashboard || {});
     renderPassportTable();
     renderPassportSelect();
-    await renderWorkflow();
+    await renderProcessFlow();
   } catch (error) {
     showMessage("dashboardMessage", error.message || "Erro ao carregar dashboard.", "error");
   }
@@ -88,11 +88,11 @@ function renderPassportSelect() {
 
 async function selectPassport(event) {
   selectedPassport = passports.find(passport => passport.id === event.target.value) || null;
-  await renderWorkflow();
+  await renderProcessFlow();
 }
 
-async function renderWorkflow() {
-  const panel = document.getElementById("workflowPanel");
+async function renderProcessFlow() {
+  const panel = document.getElementById("processFlowPanel");
   if (!panel) return;
 
   if (!selectedPassport) {
@@ -100,16 +100,16 @@ async function renderWorkflow() {
     return;
   }
 
-  const tree = await loadWorkflowTree(selectedPassport.id);
+  const tree = await loadProcessFlowTree(selectedPassport.id);
   const artifacts = await loadArtifactsByPassport(selectedPassport.id);
 
   panel.innerHTML = `
-    ${renderWorkflowTree(tree)}
+    ${renderProcessFlowTree(tree)}
     <h4 class="section-gap">Artefatos</h4>
     <div class="artifact-list">
       ${artifacts.length ? artifacts.map(artifact => renderArtifactCard(artifact)).join("") : `<p class="empty-cell">Sem artefatos.</p>`}
     </div>
   `;
 
-  attachArtifactHandlers(panel, renderWorkflow);
+  attachArtifactHandlers(panel, renderProcessFlow);
 }

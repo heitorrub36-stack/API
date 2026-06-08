@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import com.project.passport.api.dto.DashboardDto;
 import com.project.passport.api.enums.ManagerStatus;
 import com.project.passport.api.enums.MedicalStatus;
-import com.project.passport.api.enums.WorkflowStatus;
+import com.project.passport.api.enums.ProcessStatus;
 import com.project.passport.api.repository.PassportRepository;
 
 @Service
@@ -24,10 +24,10 @@ public class DashboardService {
                 MedicalStatus.APTO,
                 ManagerStatus.PENDENTE
         );
-        long openPassports = passportRepository.countByStatus(WorkflowStatus.ABERTA);
-        long validPassports = passportRepository.countByStatus(WorkflowStatus.VALIDA);
-        long invalidPassports = passportRepository.countByStatus(WorkflowStatus.INVALIDA);
-        long canceledPassports = passportRepository.countByStatus(WorkflowStatus.CANCELADA);
+        long openPassports = passportRepository.countByStatus(ProcessStatus.ABERTA);
+        long validPassports = passportRepository.countByStatus(ProcessStatus.VALIDA);
+        long invalidPassports = passportRepository.countByStatus(ProcessStatus.INVALIDA);
+        long canceledPassports = passportRepository.countByStatus(ProcessStatus.CANCELADA);
 
         return new DashboardDto(totalPassports, pendingMedicalEvaluation, fitWaitingManagerStatus,
                 openPassports, validPassports, invalidPassports, canceledPassports);

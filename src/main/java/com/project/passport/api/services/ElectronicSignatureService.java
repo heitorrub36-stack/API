@@ -19,17 +19,17 @@ public class ElectronicSignatureService {
 
     private final ElectronicSignatureRepository electronicSignatureRepository;
     private final AppUserService appUserService;
-    private final WorkflowService workflowService;
+    private final PassportFlowService passportFlowService;
     private final ArtifactRepository artifactRepository;
 
     public ElectronicSignatureService(
             ElectronicSignatureRepository electronicSignatureRepository,
             AppUserService appUserService,
-            WorkflowService workflowService,
+            PassportFlowService passportFlowService,
             ArtifactRepository artifactRepository) {
         this.electronicSignatureRepository = electronicSignatureRepository;
         this.appUserService = appUserService;
-        this.workflowService = workflowService;
+        this.passportFlowService = passportFlowService;
         this.artifactRepository = artifactRepository;
     }
 
@@ -83,12 +83,12 @@ public class ElectronicSignatureService {
         }
 
         if (targetType == SignatureTargetType.TASK) {
-            workflowService.getTaskById(targetId);
+            passportFlowService.getTaskById(targetId);
             return;
         }
 
         if (targetType == SignatureTargetType.SUBTASK) {
-            workflowService.getSubtaskById(targetId);
+            passportFlowService.getSubtaskById(targetId);
             return;
         }
 

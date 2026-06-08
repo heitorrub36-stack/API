@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.project.passport.api.enums.ManagerStatus;
 import com.project.passport.api.enums.MedicalStatus;
-import com.project.passport.api.enums.WorkflowStatus;
+import com.project.passport.api.enums.ProcessStatus;
 import com.project.passport.api.model.Passport;
 
 public interface PassportRepository extends JpaRepository<Passport, UUID> {
@@ -15,7 +15,7 @@ public interface PassportRepository extends JpaRepository<Passport, UUID> {
 
     java.util.Optional<Passport> findByCandidateAccessKey(String candidateAccessKey);
 
-    long countByStatus(WorkflowStatus status);
+    long countByStatus(ProcessStatus status);
 
     long countByMedicalStatus(MedicalStatus medicalStatus);
 

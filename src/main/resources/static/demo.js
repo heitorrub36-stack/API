@@ -1,5 +1,5 @@
 let selectedPassport = null;
-let workflow = [];
+let processFlow = [];
 let artifacts = [];
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -28,15 +28,15 @@ async function accessPassport(event) {
 async function refreshSelectedData() {
   if (!selectedPassport) {
     passportDetails.innerHTML = `<p>Informe sua chave para visualizar o passaporte.</p>`;
-    workflowPanel.innerHTML = `<p class="empty-cell">Nenhum passaporte selecionado.</p>`;
+    processFlowPanel.innerHTML = `<p class="empty-cell">Nenhum passaporte selecionado.</p>`;
     artifactList.innerHTML = `<p class="empty-cell">Nenhum passaporte selecionado.</p>`;
     artifactTarget.innerHTML = `<option value="">Informe a chave primeiro</option>`;
     return;
   }
-  workflow = await loadWorkflowTree(selectedPassport.id);
+  processFlow = await loadProcessFlowTree(selectedPassport.id);
   artifacts = await loadArtifactsByPassport(selectedPassport.id);
   renderDetails();
-  renderWorkflow();
+  renderProcessFlow();
   renderArtifacts();
   renderTargetSelect();
 }
@@ -45,10 +45,10 @@ function renderDetails() {
   passportDetails.innerHTML = `<div class="detail-grid"><p><strong>Candidato:</strong> ${escapeHtml(selectedPassport.candidateName)}</p><p><strong>CPF:</strong> ${escapeHtml(selectedPassport.candidateCpf)}</p><p><strong>Cargo:</strong> ${escapeHtml(selectedPassport.jobPosition)}</p><p><strong>Perfil:</strong> ${escapeHtml(profileName(selectedPassport))}</p><p><strong>Chave:</strong> <code>${escapeHtml(accessKeyLabel(selectedPassport))}</code></p><p><strong>Status:</strong> ${statusBadge(selectedPassport.status)}</p><p><strong>Medicina:</strong> ${escapeHtml(selectedPassport.medicalStatus || "-")}</p><p><strong>Gerente:</strong> ${escapeHtml(selectedPassport.managerStatus || "-")}</p></div>`;
 }
 
-function renderWorkflow() { workflowPanel.innerHTML = renderWorkflowTree(workflow, { mutable: false }); }
+function renderProcessFlow() { processFlowPanel.innerHTML = renderProcessFlowTree(processFlow, { mutable: false }); }
 
 function renderTargetSelect() {
-  const targets = flattenWorkflow(workflow).filter(item => ["ACTIVITY", "TASK", "SUBTASK"].includes(item.targetType));
+  const targets = flattenProcessFlow(processFlow).filter(item => ["ACTIVITY", "TASK", "SUBTASK"].includes(item.targetType));
   fillSelect(artifactTarget, targets, item => `${item.targetType}:${item.id}`, item => `${"—".repeat(item.level)} ${item.label}`, "Selecione uma atividade/tarefa/subtarefa");
 }
 

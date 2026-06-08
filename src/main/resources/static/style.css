@@ -202,7 +202,7 @@ body.redirect-page {
 .actor-card,
 .fixed-card,
 .details-box,
-.workflow-card,
+.step-card,
 .artifact-card,
 .redirect-card {
   position: relative;
@@ -302,7 +302,7 @@ body.redirect-page {
 }
 
 .actor-layout,
-.workflow-builder {
+.process-builder {
   display: grid;
   grid-template-columns: minmax(260px, 0.9fr) minmax(320px, 1.3fr);
   gap: 22px;
@@ -582,7 +582,7 @@ tr:hover td {
 
 .actor-list,
 .artifact-list,
-.workflow-container,
+.process-flow-container,
 .fixed-grid {
   display: grid;
   gap: 12px;
@@ -590,7 +590,7 @@ tr:hover td {
 
 .actor-row,
 .artifact-card,
-.workflow-card,
+.step-card,
 .fixed-card,
 .task-card,
 .subtask-row {
@@ -610,14 +610,14 @@ tr:hover td {
 
 .actor-row strong,
 .artifact-heading strong,
-.workflow-head strong {
+.step-head strong {
   display: block;
   margin-bottom: 4px;
   letter-spacing: -0.02em;
 }
 
 .artifact-heading,
-.workflow-head {
+.step-head {
   display: flex;
   justify-content: space-between;
   gap: 12px;
@@ -633,7 +633,7 @@ tr:hover td {
 }
 
 .artifact-actions,
-.workflow-actions,
+.step-actions,
 .row-actions {
   display: flex;
   flex-wrap: wrap;
@@ -651,18 +651,18 @@ tr:hover td {
   box-shadow: none;
 }
 
-.workflow-card {
+.step-card {
   padding: 0;
 }
 
-.workflow-head {
+.step-head {
   padding: 15px;
   background: linear-gradient(180deg, #fff, #f8fafc);
   border-bottom: 1px solid var(--border);
   border-radius: 16px 16px 0 0;
 }
 
-.workflow-children {
+.step-children {
   padding: 14px;
   display: grid;
   gap: 12px;
@@ -817,7 +817,7 @@ tr:hover td {
     grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   }
   .actor-layout,
-  .workflow-builder,
+  .process-builder,
   .hero-panel {
     grid-template-columns: 1fr;
   }
@@ -863,7 +863,7 @@ tr:hover td {
 
   .panel-heading,
   .artifact-heading,
-  .workflow-head,
+  .step-head,
   .actor-row {
     align-items: flex-start;
     flex-direction: column;
@@ -907,4 +907,35 @@ tr:hover td {
 
 .inbox-panel .artifact-card {
   background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+}
+
+/* Ações de exclusão adicionadas para a área do RH */
+.tag-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding-right: 7px;
+}
+
+.tag-delete {
+  width: 22px;
+  height: 22px;
+  border: 0;
+  border-radius: 999px;
+  background: #fee2e2;
+  color: #991b1b;
+  font-weight: 900;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.tag-delete:hover {
+  background: #fecaca;
+}
+
+.row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
 }

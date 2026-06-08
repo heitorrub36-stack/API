@@ -3,7 +3,7 @@ let profiles = [];
 let passports = [];
 let categories = [];
 let selectedPassport = null;
-let selectedWorkflow = [];
+let selectedProcessFlow = [];
 let selectedArtifacts = [];
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -53,7 +53,10 @@ function renderFixedProfiles() {
     <article class="fixed-card">
       <strong>${profile.name}</strong>
       <span>${profile.description}</span>
-      <button type="button" class="ghost-button" data-fixed-profile="${profile.name}">Usar este perfil</button>
+      <div class="row-actions">
+        <button type="button" class="ghost-button" data-fixed-profile="${profile.name}">Usar este perfil</button>
+        <button type="button" class="ghost-button danger-text" data-delete-fixed-profile="${profile.name}">Excluir criados</button>
+      </div>
     </article>`).join("");
   document.querySelectorAll("[data-fixed-profile]").forEach(button => button.addEventListener("click", () => {
     const profile = FIXED_PROFILES.find(item => item.name === button.dataset.fixedProfile);
@@ -61,6 +64,9 @@ function renderFixedProfiles() {
     document.getElementById("profileDescription").value = profile.description;
     document.getElementById("profileVersion").value = 1;
     document.getElementById("profilePublished").value = "false";
+  }));
+  document.querySelectorAll("[data-delete-fixed-profile]").forEach(button => button.addEventListener("click", async () => {
+    await deleteFixedProfilesByName(button.dataset.deleteFixedProfile);
   }));
 }
 
@@ -155,6 +161,72 @@ async function createProfileNewVersion(profile) {
   await refreshAll();
 }
 
+async function deleteProfile(profile) {
+  if (!profile) return;
+  if (!confirm(`Excluir o perfil ${profile.name}? Perfis vinculados a passaportes podem não ser removidos pelo banco.`)) return;
+  try {
+    await api(`/passport-profiles/${profile.id}`, { method: "DELETE" });
+    showMessage("rhMessage", "Perfil excluído.", "success");
+    if (selectedPassport?.profile?.id === profile.id) selectedPassport = null;
+    await refreshAll();
+  } catch (error) {
+    showMessage("rhMessage", error.message || "Não foi possível excluir o perfil. Verifique se ele já está vinculado a um passaporte.", "error");
+  }
+}
+
+async function deleteFixedProfilesByName(profileName) {
+  const matches = profiles.filter(profile => profile.name === profileName || profile.name.startsWith(`${profileName} - v`));
+  if (!matches.length) return showMessage("rhMessage", "Nenhum perfil criado com este cargo fixo foi encontrado.", "error");
+  if (!confirm(`Excluir ${matches.length} perfil(is) criado(s) para ${profileName}?`)) return;
+  try {
+    for (const profile of matches) {
+      await api(`/passport-profiles/${profile.id}`, { method: "DELETE" });
+    }
+    showMessage("rhMessage", "Perfis fixos criados foram excluídos.", "success");
+    await refreshAll();
+  } catch (error) {
+    showMessage("rhMessage", error.message || "Não foi possível excluir algum perfil. Verifique se ele já está em uso.", "error");
+    await refreshAll();
+  }
+}
+
+async function deleteUser(user) {
+  if (!user) return;
+  if (!confirm(`Excluir o usuário ${user.name}?`)) return;
+  try {
+    await api(`/users/${user.id}`, { method: "DELETE" });
+    showMessage("rhMessage", "Usuário excluído.", "success");
+    await refreshAll();
+  } catch (error) {
+    showMessage("rhMessage", error.message || "Não foi possível excluir o usuário. Verifique se ele está vinculado a algum passaporte.", "error");
+  }
+}
+
+async function deletePassportFromRh(passport) {
+  if (!passport) return;
+  if (!confirm(`Excluir o passaporte de ${passport.candidateName}?`)) return;
+  try {
+    await api(`/passports/${passport.id}`, { method: "DELETE" });
+    if (selectedPassport?.id === passport.id) selectedPassport = null;
+    showMessage("rhMessage", "Passaporte excluído.", "success");
+    await refreshAll();
+  } catch (error) {
+    showMessage("rhMessage", error.message || "Não foi possível excluir o passaporte.", "error");
+  }
+}
+
+async function deleteCategory(category) {
+  if (!category) return;
+  if (!confirm(`Excluir a categoria de documento ${category.name}?`)) return;
+  try {
+    await api(`/document-categories/${category.id}`, { method: "DELETE" });
+    showMessage("rhMessage", "Categoria de documento excluída.", "success");
+    await refreshAll();
+  } catch (error) {
+    showMessage("rhMessage", error.message || "Não foi possível excluir a categoria.", "error");
+  }
+}
+
 async function createPassport(event) {
   event.preventDefault();
   try {
@@ -182,21 +254,21 @@ function syncJobWithProfile() {
 async function createActivity(event) {
   event.preventDefault();
   if (!selectedPassport) return showMessage("rhMessage", "Selecione um passaporte.", "error");
-  await api(`/workflow/passports/${selectedPassport.id}/activities`, { method: "POST", body: JSON.stringify({ name: activityName.value.trim(), description: "Atividade criada pelo RH", orderNumber: Number(activityOrder.value || selectedWorkflow.length + 1), responsibleRole: activityRole.value }) });
+  await api(`/passport-flow/passports/${selectedPassport.id}/activities`, { method: "POST", body: JSON.stringify({ name: activityName.value.trim(), description: "Atividade criada pelo RH", orderNumber: Number(activityOrder.value || selectedProcessFlow.length + 1), responsibleRole: activityRole.value }) });
   event.target.reset();
   await refreshSelectedPassportData();
 }
 
 async function createTask(event) {
   event.preventDefault();
-  await api(`/workflow/activities/${activityForTask.value}/tasks`, { method: "POST", body: JSON.stringify({ name: taskName.value.trim(), description: "Tarefa criada pelo RH", deadline: taskDeadline.value || null, responsibleRole: taskRole.value }) });
+  await api(`/passport-flow/activities/${activityForTask.value}/tasks`, { method: "POST", body: JSON.stringify({ name: taskName.value.trim(), description: "Tarefa criada pelo RH", deadline: taskDeadline.value || null, responsibleRole: taskRole.value }) });
   event.target.reset();
   await refreshSelectedPassportData();
 }
 
 async function createSubtask(event) {
   event.preventDefault();
-  await api(`/workflow/tasks/${taskForSubtask.value}/subtasks`, { method: "POST", body: JSON.stringify({ name: subtaskName.value.trim(), description: "Subtarefa criada pelo RH", deadline: subtaskDeadline.value || null, responsibleRole: subtaskRole.value }) });
+  await api(`/passport-flow/tasks/${taskForSubtask.value}/subtasks`, { method: "POST", body: JSON.stringify({ name: subtaskName.value.trim(), description: "Subtarefa criada pelo RH", deadline: subtaskDeadline.value || null, responsibleRole: subtaskRole.value }) });
   event.target.reset();
   await refreshSelectedPassportData();
 }
@@ -230,21 +302,25 @@ async function createArtifact(event) {
     const artifact = await api("/artifacts", { method: "POST", body: JSON.stringify(payload) });
     await saveArtifactFile(artifact.id, file);
     event.target.reset();
-    showMessage("rhMessage", "Artefato vinculado ao workflow.", "success");
+    showMessage("rhMessage", "Artefato vinculado ao fluxo de etapas.", "success");
     await refreshSelectedPassportData();
   } catch (error) { showMessage("rhMessage", error.message, "error"); }
 }
 
 function renderUsers() {
-  userList.innerHTML = users.map(u => `<article class="actor-row"><strong>${escapeHtml(u.name)}</strong><span>${escapeHtml(u.email)}</span><span class="mini-status">${roleLabel(u.role)}</span></article>`).join("") || `<p class="empty-cell">Nenhum usuário cadastrado.</p>`;
+  userList.innerHTML = users.map(u => `<article class="actor-row"><strong>${escapeHtml(u.name)}</strong><span>${escapeHtml(u.email)}</span><span class="mini-status">${roleLabel(u.role)}</span><div class="row-actions"><button type="button" class="mini-button danger-text" data-delete-user="${u.id}">Excluir</button></div></article>`).join("") || `<p class="empty-cell">Nenhum usuário cadastrado.</p>`;
+  userList.querySelectorAll("[data-delete-user]").forEach(button => button.addEventListener("click", async () => {
+    await deleteUser(users.find(user => user.id === button.dataset.deleteUser));
+  }));
 }
 
 function renderProfiles() {
   profileList.innerHTML = profiles.map(p => `
-    <article class="actor-row"><strong>${escapeHtml(p.name)}</strong><span>${escapeHtml(p.description || "Sem descrição")}</span><span class="mini-status">v${p.version || 1} · ${p.published ? "Publicado" : "Rascunho"} · ${p.active ? "Ativo" : "Inativo"}</span><div class="row-actions"><button data-publish-profile="${p.id}" class="mini-button">Publicar</button><button data-toggle-profile="${p.id}" class="mini-button">${p.active ? "Desabilitar" : "Habilitar"}</button><button data-version-profile="${p.id}" class="mini-button">Nova versão</button></div></article>`).join("") || `<p class="empty-cell">Nenhum perfil cadastrado.</p>`;
+    <article class="actor-row"><strong>${escapeHtml(p.name)}</strong><span>${escapeHtml(p.description || "Sem descrição")}</span><span class="mini-status">v${p.version || 1} · ${p.published ? "Publicado" : "Rascunho"} · ${p.active ? "Ativo" : "Inativo"}</span><div class="row-actions"><button data-publish-profile="${p.id}" class="mini-button">Publicar</button><button data-toggle-profile="${p.id}" class="mini-button">${p.active ? "Desabilitar" : "Habilitar"}</button><button data-version-profile="${p.id}" class="mini-button">Nova versão</button><button data-delete-profile="${p.id}" class="mini-button danger-text">Excluir</button></div></article>`).join("") || `<p class="empty-cell">Nenhum perfil cadastrado.</p>`;
   profileList.querySelectorAll("[data-publish-profile]").forEach(b => b.onclick = async () => updateProfile(profiles.find(p => p.id === b.dataset.publishProfile), { published: true, active: true }));
   profileList.querySelectorAll("[data-toggle-profile]").forEach(b => b.onclick = async () => { const p = profiles.find(p => p.id === b.dataset.toggleProfile); await updateProfile(p, { active: !p.active }); });
   profileList.querySelectorAll("[data-version-profile]").forEach(b => b.onclick = async () => createProfileNewVersion(profiles.find(p => p.id === b.dataset.versionProfile)));
+  profileList.querySelectorAll("[data-delete-profile]").forEach(b => b.onclick = async () => deleteProfile(profiles.find(p => p.id === b.dataset.deleteProfile)));
 }
 
 function renderPassportFormOptions() {
@@ -253,7 +329,10 @@ function renderPassportFormOptions() {
 }
 
 function renderPassports() {
-  passportTableBody.innerHTML = passports.map(p => `<tr><td>${escapeHtml(p.candidateName)}</td><td>${escapeHtml(p.candidateCpf)}</td><td>${escapeHtml(p.jobPosition)}</td><td><code>${escapeHtml(accessKeyLabel(p))}</code></td><td>${escapeHtml(profileName(p))}</td><td>${escapeHtml(userName(p.createdByRh))}</td><td>${statusBadge(p.status)}</td></tr>`).join("") || `<tr><td colspan="7" class="empty-cell">Nenhum passaporte cadastrado.</td></tr>`;
+  passportTableBody.innerHTML = passports.map(p => `<tr><td>${escapeHtml(p.candidateName)}</td><td>${escapeHtml(p.candidateCpf)}</td><td>${escapeHtml(p.jobPosition)}</td><td><code>${escapeHtml(accessKeyLabel(p))}</code></td><td>${escapeHtml(profileName(p))}</td><td>${escapeHtml(userName(p.createdByRh))}</td><td>${statusBadge(p.status)}</td><td><button type="button" class="mini-button danger-text" data-delete-passport="${p.id}">Excluir</button></td></tr>`).join("") || `<tr><td colspan="8" class="empty-cell">Nenhum passaporte cadastrado.</td></tr>`;
+  passportTableBody.querySelectorAll("[data-delete-passport]").forEach(button => button.addEventListener("click", async () => {
+    await deletePassportFromRh(passports.find(passport => passport.id === button.dataset.deletePassport));
+  }));
 }
 
 function renderPassportSelect() {
@@ -268,7 +347,7 @@ async function selectPassport(event) {
 
 async function refreshSelectedPassportData() {
   if (!selectedPassport) {
-    workflowPanel.innerHTML = `<p class="empty-cell">Selecione um passaporte para ver o workflow.</p>`;
+    processFlowPanel.innerHTML = `<p class="empty-cell">Selecione um passaporte para ver o fluxo de etapas.</p>`;
     artifactTarget.innerHTML = `<option value="">Selecione um passaporte primeiro</option>`;
     activityForTask.innerHTML = `<option value="">Selecione um passaporte primeiro</option>`;
     taskForSubtask.innerHTML = `<option value="">Selecione uma tarefa primeiro</option>`;
@@ -276,22 +355,22 @@ async function refreshSelectedPassportData() {
     if (typeof rhInboxList !== "undefined") rhInboxList.innerHTML = `<p class="empty-cell">Selecione um passaporte para ver documentos recebidos.</p>`;
     return;
   }
-  selectedWorkflow = await loadWorkflowTree(selectedPassport.id);
+  selectedProcessFlow = await loadProcessFlowTree(selectedPassport.id);
   selectedArtifacts = await loadArtifactsByPassport(selectedPassport.id);
-  workflowPanel.innerHTML = renderWorkflowTree(selectedWorkflow, { mutable: true });
-  attachWorkflowHandlers(workflowPanel, refreshSelectedPassportData);
-  const flat = flattenWorkflow(selectedWorkflow);
+  processFlowPanel.innerHTML = renderProcessFlowTree(selectedProcessFlow, { mutable: true });
+  attachStepHandlers(processFlowPanel, refreshSelectedPassportData);
+  const flat = flattenProcessFlow(selectedProcessFlow);
   fillSelect(activityForTask, flat.filter(i => i.targetType === "ACTIVITY"), i => i.id, i => i.label, "Selecione atividade");
   fillSelect(taskForSubtask, flat.filter(i => i.targetType === "TASK"), i => i.id, i => i.label, "Selecione tarefa");
   fillSelect(artifactTarget, flat, i => `${i.targetType}:${i.id}`, i => `${"—".repeat(i.level)} ${i.label}`, "Selecione destino");
   const inboxArtifacts = selectedArtifacts.filter(a => artifactDestination(a) === "RH" && artifactOrigin(a) === "Candidato");
   rhInboxList.innerHTML = inboxArtifacts.length
-    ? inboxArtifacts.map(a => renderArtifactCard(a, { canForward: true })).join("")
+    ? inboxArtifacts.map(a => renderArtifactCard(a, { canForward: true, canDelete: true })).join("")
     : `<p class="empty-cell">Nenhum documento enviado pelo candidato aguardando encaminhamento do RH.</p>`;
   attachArtifactHandlers(rhInboxList, refreshSelectedPassportData);
   attachForwardHandlers(rhInboxList);
 
-  artifactList.innerHTML = selectedArtifacts.length ? selectedArtifacts.map(a => renderArtifactCard(a, { canValidate: true })).join("") : `<p class="empty-cell">Nenhum artefato.</p>`;
+  artifactList.innerHTML = selectedArtifacts.length ? selectedArtifacts.map(a => renderArtifactCard(a, { canValidate: true, canDelete: true })).join("") : `<p class="empty-cell">Nenhum artefato.</p>`;
   attachArtifactHandlers(artifactList, refreshSelectedPassportData);
 }
 
@@ -330,5 +409,12 @@ function attachForwardHandlers(container) {
 }
 
 function renderCategories() {
-  categoryList.innerHTML = categories.length ? categories.map(c => `<span class="tag">${escapeHtml(c.name)} · ${escapeHtml(c.permitType || "")}</span>`).join("") : DOCUMENT_CATEGORIES.map(c => `<span class="tag muted-tag">${escapeHtml(c)}</span>`).join("");
+  if (categories.length) {
+    categoryList.innerHTML = categories.map(c => `<span class="tag tag-action">${escapeHtml(c.name)} · ${escapeHtml(c.permitType || "")}<button type="button" class="tag-delete" data-delete-category="${c.id}" title="Excluir categoria">×</button></span>`).join("");
+    categoryList.querySelectorAll("[data-delete-category]").forEach(button => button.addEventListener("click", async () => {
+      await deleteCategory(categories.find(category => category.id === button.dataset.deleteCategory));
+    }));
+  } else {
+    categoryList.innerHTML = DOCUMENT_CATEGORIES.map(c => `<span class="tag muted-tag">${escapeHtml(c)}</span>`).join("");
+  }
 }

@@ -1,7 +1,7 @@
 let users = [];
 let passports = [];
 let selectedPassport = null;
-let workflow = [];
+let processFlow = [];
 let artifacts = [];
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -24,10 +24,10 @@ async function refreshPage() {
 async function selectPassport(event) { selectedPassport = passports.find(p => p.id === event.target.value) || null; await refreshSelectedData(); }
 
 async function refreshSelectedData() {
-  if (!selectedPassport) { passportDetails.innerHTML = `<p>Selecione um passaporte.</p>`; managerArtifacts.innerHTML = `<p class="empty-cell">Nenhum passaporte selecionado.</p>`; managerWorkflow.innerHTML = `<p class="empty-cell">Nenhum passaporte selecionado.</p>`; return; }
-  workflow = await loadWorkflowTree(selectedPassport.id);
+  if (!selectedPassport) { passportDetails.innerHTML = `<p>Selecione um passaporte.</p>`; managerArtifacts.innerHTML = `<p class="empty-cell">Nenhum passaporte selecionado.</p>`; managerProcessFlow.innerHTML = `<p class="empty-cell">Nenhum passaporte selecionado.</p>`; return; }
+  processFlow = await loadProcessFlowTree(selectedPassport.id);
   artifacts = await loadArtifactsByPassport(selectedPassport.id);
-  renderDetails(); renderArtifacts(); renderWorkflow();
+  renderDetails(); renderArtifacts(); renderProcessFlow();
 }
 
 function renderDetails() {
@@ -43,10 +43,10 @@ function renderArtifacts() {
   attachSignatureHandlers(managerArtifacts, "managerReviewer", refreshSelectedData);
 }
 
-function renderWorkflow() {
-  const tree = workflow.filter(a => a.responsibleRole === "GERENTE" || (a.tasks || []).some(t => t.responsibleRole === "GERENTE"));
-  managerWorkflow.innerHTML = renderWorkflowTree(tree.length ? tree : workflow, { canSign: true });
-  attachSignatureHandlers(managerWorkflow, "managerReviewer", refreshSelectedData);
+function renderProcessFlow() {
+  const tree = processFlow.filter(a => a.responsibleRole === "GERENTE" || (a.tasks || []).some(t => t.responsibleRole === "GERENTE"));
+  managerProcessFlow.innerHTML = renderProcessFlowTree(tree.length ? tree : processFlow, { canSign: true });
+  attachSignatureHandlers(managerProcessFlow, "managerReviewer", refreshSelectedData);
 }
 
 async function saveManagerReview(event) {
