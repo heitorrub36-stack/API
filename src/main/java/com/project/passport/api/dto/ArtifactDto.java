@@ -5,6 +5,7 @@ import java.util.UUID;
 public class ArtifactDto {
 
     private UUID passportId;
+    private UUID activityId;
     private UUID taskId;
     private UUID subtaskId;
     private String documentName;
@@ -19,6 +20,12 @@ public class ArtifactDto {
     }
     public void setPassportId(UUID passportId) {
         this.passportId = passportId;
+    }
+    public UUID getActivityId() {
+        return activityId;
+    }
+    public void setActivityId(UUID activityId) {
+        this.activityId = activityId;
     }
     public UUID getTaskId() {
         return taskId;

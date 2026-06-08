@@ -25,6 +25,8 @@ public class PassportProfileService {
         PassportProfile profile = new PassportProfile();
         profile.setName(dto.getName());
         profile.setDescription(dto.getDescription());
+        profile.setVersion(dto.getVersion() != null ? dto.getVersion() : 1);
+        profile.setPublished(dto.getPublished() != null ? dto.getPublished() : false);
         profile.setActive(dto.getActive() != null ? dto.getActive() : true);
 
         return passportProfileRepository.save(profile);
@@ -45,6 +47,8 @@ public class PassportProfileService {
         PassportProfile profile = getProfileById(id);
         profile.setName(dto.getName());
         profile.setDescription(dto.getDescription());
+        profile.setVersion(dto.getVersion() != null ? dto.getVersion() : 1);
+        profile.setPublished(dto.getPublished() != null ? dto.getPublished() : false);
         profile.setActive(dto.getActive() != null ? dto.getActive() : true);
 
         return passportProfileRepository.save(profile);

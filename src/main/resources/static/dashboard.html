@@ -1,64 +1,7 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Passaporte - Dashboard</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-
-<header class="topbar">
-    <h1>Sistema Passaporte</h1>
-    <nav>
-        <a href="rh.html">RH</a>
-        <a href="review.html">Medicina/Gerente</a>
-        <a href="dashboard.html" class="active">Dashboard</a>
-        <a href="demo.html">Demo</a>
-    </nav>
-</header>
-
-<main class="container">
-
-    <section class="page-title">
-        <h2>Dashboard geral</h2>
-        <p>Resumo visual dos passaportes de candidatos no processo de admiss&atilde;o.</p>
-    </section>
-
-    <section class="cards">
-        <div class="card"><span>Total cadastrados</span><strong id="totalPassports">0</strong></div>
-        <div class="card"><span>Pendentes de avalia&ccedil;&atilde;o m&eacute;dica</span><strong id="pendingMedicalEvaluation">0</strong></div>
-        <div class="card"><span>Aptos aguardando gerente</span><strong id="fitWaitingManagerStatus">0</strong></div>
-        <div class="card"><span>Abertos</span><strong id="openPassports">0</strong></div>
-        <div class="card"><span>Validados</span><strong id="validPassports">0</strong></div>
-        <div class="card"><span>Inv&aacute;lidos</span><strong id="invalidPassports">0</strong></div>
-        <div class="card"><span>Cancelados</span><strong id="canceledPassports">0</strong></div>
-    </section>
-
-    <section class="panel">
-        <h3>Passaportes cadastrados</h3>
-        <p class="message" id="dashboardMessage" hidden></p>
-
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Candidato</th>
-                        <th>CPF</th>
-                        <th>Cargo</th>
-                        <th>Avalia&ccedil;&atilde;o m&eacute;dica</th>
-                        <th>Decis&atilde;o gerente</th>
-                        <th>Anexos</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody id="passportTableBody"></tbody>
-            </table>
-        </div>
-    </section>
-
-</main>
-
-<script src="dashboard.js"></script>
-</body>
-</html>
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Sistema Passaporte - Dashboard</title><link rel="stylesheet" href="style.css"></head><body>
+<header class="topbar"><h1>Sistema Passaporte</h1><nav><a href="demo.html">Candidato</a><a href="rh.html">RH</a><a href="medical.html">Medicina</a><a href="manager.html">Gerente</a><a href="dashboard.html" class="active">Dashboard</a></nav></header>
+<main class="container"><section class="page-title split-title"><div><span class="eyebrow">Dashboard</span><h2>Status de passaportes e workflow</h2><p>Resumo baseado nos status do glossário: ABERTA, VALIDA, INVALIDA e CANCELADA.</p></div><button id="refreshDashboardButton">Atualizar</button></section><p id="dashboardMessage" class="message" hidden></p>
+<section class="cards"><div class="card"><span>Total cadastrados</span><strong id="totalPassports">0</strong></div><div class="card"><span>Pendentes avaliação médica</span><strong id="pendingMedicalEvaluation">0</strong></div><div class="card"><span>Aptos aguardando gerente</span><strong id="fitWaitingManagerStatus">0</strong></div><div class="card"><span>Abertos</span><strong id="openPassports">0</strong></div><div class="card"><span>Validados</span><strong id="validPassports">0</strong></div><div class="card"><span>Inválidos</span><strong id="invalidPassports">0</strong></div><div class="card"><span>Cancelados</span><strong id="canceledPassports">0</strong></div></section>
+<section class="panel"><div class="panel-heading"><h3>Passaportes</h3><div class="toolbar"><input id="searchInput" type="search" placeholder="Buscar candidato, CPF, cargo ou chave"><select id="statusFilter"><option value="">Todos</option><option>ABERTA</option><option>VALIDA</option><option>INVALIDA</option><option>CANCELADA</option></select></div></div><div class="table-wrap"><table><thead><tr><th>Candidato</th><th>CPF</th><th>Cargo</th><th>Chave</th><th>Médico</th><th>Gerente</th><th>Status</th></tr></thead><tbody id="passportTableBody"></tbody></table></div></section>
+<section class="panel"><h3>Detalhe de workflow</h3><div class="form-group"><label for="passportSelect">Selecionar passaporte</label><select id="passportSelect"></select></div><div id="workflowPanel" class="workflow-container"></div></section>
+</main><script src="shared.js"></script><script src="dashboard.js"></script></body></html>

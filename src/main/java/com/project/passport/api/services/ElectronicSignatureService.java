@@ -26,8 +26,7 @@ public class ElectronicSignatureService {
             ElectronicSignatureRepository electronicSignatureRepository,
             AppUserService appUserService,
             WorkflowService workflowService,
-            ArtifactRepository artifactRepository
-    ) {
+            ArtifactRepository artifactRepository) {
         this.electronicSignatureRepository = electronicSignatureRepository;
         this.appUserService = appUserService;
         this.workflowService = workflowService;

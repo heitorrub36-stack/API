@@ -38,6 +38,9 @@ public class Passport {
     @Column(nullable = false)
     private String jobPosition;
 
+    @Column(unique = true)
+    private String candidateAccessKey;
+
     @Column(nullable = false)
     private LocalDate createdAt;
 
@@ -86,6 +89,8 @@ public class Passport {
     public void setCandidateCpf(String candidateCpf) { this.candidateCpf = candidateCpf; }
     public String getJobPosition() { return jobPosition; }
     public void setJobPosition(String jobPosition) { this.jobPosition = jobPosition; }
+    public String getCandidateAccessKey() { return candidateAccessKey; }
+    public void setCandidateAccessKey(String candidateAccessKey) { this.candidateAccessKey = candidateAccessKey; }
     public LocalDate getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDate createdAt) { this.createdAt = createdAt; }
     public WorkflowStatus getStatus() { return status; }

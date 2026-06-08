@@ -34,6 +34,11 @@ public class PassportController {
         return passportService.getAllPassports();
     }
 
+    @GetMapping("/access/{accessKey}")
+    public Passport getPassportByAccessKey(@PathVariable String accessKey) {
+        return passportService.getPassportByAccessKey(accessKey);
+    }
+
     @GetMapping("/{id}")
     public Passport getPassportById(@PathVariable UUID id) {
         return passportService.getPassportById(id);
@@ -59,9 +64,10 @@ public class PassportController {
         return passportService.cancelPassport(id);
     }
 
-  @DeleteMapping("/{id}")
-public ResponseEntity<Void> deletePassport(@PathVariable UUID id) {
-    passportService.deletePassport(id);
-    return ResponseEntity.noContent().build();
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePassport(@PathVariable UUID id) {
+        passportService.deletePassport(id);
+        return ResponseEntity.noContent().build();
+    }
 }
-}
+

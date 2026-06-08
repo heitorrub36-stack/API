@@ -12,6 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.project.passport.api.dto.ArtifactDto;
 import com.project.passport.api.enums.WorkflowStatus;
 import com.project.passport.api.model.Artifact;
+import com.project.passport.api.model.PassportActivity;
 import com.project.passport.api.model.PassportTask;
 import com.project.passport.api.model.PassportSubtask;
 import com.project.passport.api.repository.ArtifactRepository;
@@ -38,7 +39,10 @@ public class ArtifactService {
         artifact.setUploadDate(LocalDate.now());
         artifact.setStatus(WorkflowStatus.ABERTA);
 
-        if (artifactDto.getTaskId() != null) {
+        if (artifactDto.getActivityId() != null) {
+            PassportActivity activity = workflowService.getActivityById(artifactDto.getActivityId());
+            artifact.setActivity(activity);
+        } else if (artifactDto.getTaskId() != null) {
             PassportTask task = workflowService.getTaskById(artifactDto.getTaskId());
             artifact.setTask(task);
         } else if (artifactDto.getSubtaskId() != null) {
@@ -55,6 +59,7 @@ public class ArtifactService {
 
     public List<Artifact> getArtifactsByPassportId(UUID passportId) {
         List<Artifact> artifacts = new ArrayList<>();
+        artifacts.addAll(artifactRepository.findByActivityPassportId(passportId));
         artifacts.addAll(artifactRepository.findByTaskActivityPassportId(passportId));
         artifacts.addAll(artifactRepository.findBySubtaskTaskActivityPassportId(passportId));
         return artifacts;
@@ -88,11 +93,16 @@ public class ArtifactService {
         if (artifactDto == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Artifact data is required");
         }
-        if (artifactDto.getPassportId() == null && artifactDto.getTaskId() == null && artifactDto.getSubtaskId() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Artifact must be linked to a passport, task or subtask");
+        int targets = 0;
+        if (artifactDto.getPassportId() != null) targets++;
+        if (artifactDto.getActivityId() != null) targets++;
+        if (artifactDto.getTaskId() != null) targets++;
+        if (artifactDto.getSubtaskId() != null) targets++;
+        if (targets == 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Artifact must be linked to a passport, activity, task or subtask");
         }
-        if (artifactDto.getTaskId() != null && artifactDto.getSubtaskId() != null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Artifact must be linked to only one target: task or subtask");
+        if (artifactDto.getPassportId() == null && targets > 1) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Artifact must be linked to only one workflow target");
         }
         if (isBlank(artifactDto.getDocumentName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Document name is required");

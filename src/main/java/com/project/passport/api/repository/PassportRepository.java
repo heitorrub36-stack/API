@@ -11,6 +11,10 @@ import com.project.passport.api.model.Passport;
 
 public interface PassportRepository extends JpaRepository<Passport, UUID> {
 
+    boolean existsByCandidateAccessKey(String candidateAccessKey);
+
+    java.util.Optional<Passport> findByCandidateAccessKey(String candidateAccessKey);
+
     long countByStatus(WorkflowStatus status);
 
     long countByMedicalStatus(MedicalStatus medicalStatus);

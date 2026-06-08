@@ -22,6 +22,11 @@ public class PassportProfile {
 
     private String description;
 
+    private Integer version;
+
+    @Column(nullable = false)
+    private Boolean published;
+
     @Column(nullable = false)
     private Boolean active;
 
@@ -50,6 +55,22 @@ public class PassportProfile {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Integer getVersion() {
+        return version;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
+    }
+
+    public Boolean getPublished() {
+        return published;
+    }
+
+    public void setPublished(Boolean published) {
+        this.published = published;
     }
 
     public Boolean getActive() {

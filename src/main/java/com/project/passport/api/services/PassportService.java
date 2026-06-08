@@ -45,12 +45,16 @@ public class PassportService {
             if (Boolean.FALSE.equals(profile.getActive())) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Passport profile is inactive");
             }
+            if (!Boolean.TRUE.equals(profile.getPublished())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Passport profile must be published before creating passports");
+            }
             passport.setProfile(profile);
         }
 
         passport.setCandidateName(dto.getCandidateName());
         passport.setCandidateCpf(dto.getCandidateCpf());
         passport.setJobPosition(dto.getJobPosition());
+        passport.setCandidateAccessKey(generateCandidateAccessKey());
         passport.setCreatedAt(LocalDate.now());
         passport.setStatus(WorkflowStatus.ABERTA);
         passport.setMedicalStatus(MedicalStatus.PENDENTE);
@@ -75,6 +79,14 @@ public class PassportService {
     public Passport getPassportById(UUID id) {
         return passportRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Passport not found"));
+    }
+
+    public Passport getPassportByAccessKey(String accessKey) {
+        if (isBlank(accessKey)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Candidate access key is required");
+        }
+        return passportRepository.findByCandidateAccessKey(accessKey.trim().toUpperCase())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Passport not found for this access key"));
     }
 
     public Passport updateMedicalReview(UUID id, MedicalReviewDto dto) {
@@ -151,6 +163,13 @@ public class PassportService {
 
 
 
+    private String generateCandidateAccessKey() {
+        String key;
+        do {
+            key = UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase();
+        } while (passportRepository.existsByCandidateAccessKey(key));
+        return key;
+    }
 
     private void validatePassportDto(PassportDto dto) {
         if (dto == null) {

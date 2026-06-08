@@ -43,6 +43,10 @@ public class Artifact {
     private String invalidationReason;
 
     @ManyToOne
+    @JoinColumn(name = "activity_id")
+    private PassportActivity activity;
+
+    @ManyToOne
     @JoinColumn(name = "task_id")
     private PassportTask task;
 
@@ -69,6 +73,8 @@ public class Artifact {
     public void setStatus(WorkflowStatus status) { this.status = status; }
     public String getInvalidationReason() { return invalidationReason; }
     public void setInvalidationReason(String invalidationReason) { this.invalidationReason = invalidationReason; }
+    public PassportActivity getActivity() { return activity; }
+    public void setActivity(PassportActivity activity) { this.activity = activity; }
     public PassportTask getTask() { return task; }
     public void setTask(PassportTask task) { this.task = task; }
     public PassportSubtask getSubtask() { return subtask; }

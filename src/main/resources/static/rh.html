@@ -1,115 +1,98 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Passaporte - RH</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema Passaporte - RH</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
 <header class="topbar">
-    <h1>Sistema Passaporte</h1>
-    <nav>
-        <a href="rh.html" class="active">RH</a>
-        <a href="review.html">Medicina/Gerente</a>
-        <a href="dashboard.html">Dashboard</a>
-        <a href="demo.html">Demo</a>
-    </nav>
+  <h1>Sistema Passaporte</h1>
+  <nav><a href="demo.html">Cadastro</a><a href="rh.html" class="active">RH</a><a href="medical.html">Medicina</a><a href="manager.html">Gerente</a><a href="dashboard.html">Dashboard</a></nav>
 </header>
-
 <main class="container">
+  <section class="page-title split-title">
+    <div><span class="eyebrow">Responsável do RH</span><h2>Perfis, passaportes e workflow</h2><p>Crie perfis por categoria profissional, publique, gere passaportes, mantenha atividades/tarefas/subtarefas e acompanhe documentos.</p></div>
+    <button id="refreshButton" type="button">Atualizar</button>
+  </section>
+  <p class="message" id="rhMessage" hidden></p>
 
-    <section class="page-title">
-        <h2>Tela do RH</h2>
-        <p>Cadastro e acompanhamento de passaportes de candidatos.</p>
-    </section>
+  <section class="cards">
+    <div class="card">
+      <span>Candidatos cadastrados</span>
+      <strong id="candidateCount">0</strong>
+    </div>
+  </section>
 
-    <section class="cards" id="dashboardCards">
-        <div class="card"><span>Total cadastrados</span><strong id="totalPassports">0</strong></div>
-        <div class="card"><span>Pendentes de avalia&ccedil;&atilde;o m&eacute;dica</span><strong id="pendingMedicalEvaluation">0</strong></div>
-        <div class="card"><span>Aptos aguardando gerente</span><strong id="fitWaitingManagerStatus">0</strong></div>
-        <div class="card"><span>Abertos</span><strong id="openPassports">0</strong></div>
-        <div class="card"><span>Validados</span><strong id="validPassports">0</strong></div>
-        <div class="card"><span>Inv&aacute;lidos</span><strong id="invalidPassports">0</strong></div>
-        <div class="card"><span>Cancelados</span><strong id="canceledPassports">0</strong></div>
-    </section>
+  <section class="panel">
+    <div class="panel-heading"><h3>Atores do sistema</h3><button class="ghost-button" id="seedUsersButton" type="button">Criar atores de exemplo</button></div>
+    <div class="actor-layout">
+      <form id="userForm" class="compact-form"><h4>Novo usuário</h4>
+        <div class="form-group"><label for="userName">Nome</label><input id="userName" required></div>
+        <div class="form-group"><label for="userEmail">E-mail</label><input id="userEmail" type="email" required></div>
+        <div class="form-group"><label for="userRole">Papel</label><select id="userRole"><option value="RH">RH</option><option value="CONTRATADO">Contratado</option><option value="MEDICINA_TRABALHO">Medicina do Trabalho</option><option value="GERENTE">Gerente</option><option value="ADMINISTRADOR">Administrador</option><option value="SEGURANCA_TRABALHO">Segurança do Trabalho</option></select></div>
+        <button type="submit">Cadastrar usuário</button>
+      </form>
+      <div><h4>Usuários cadastrados</h4><div id="userList" class="actor-list"></div></div>
+    </div>
+  </section>
 
-    <section class="panel">
-        <div class="panel-heading">
-            <h3>Cadastrar novo passaporte</h3>
-            <button type="button" class="ghost-button" id="createDefaultRhButton">Criar RH padr&atilde;o</button>
-        </div>
+  <section class="panel">
+    <div class="panel-heading"><h3>Perfis de Passaporte</h3><button class="ghost-button" id="createFixedProfilesButton" type="button">Criar perfis fixos</button></div>
+    <div class="fixed-grid" id="fixedProfileGrid"></div>
+    <div class="actor-layout section-gap">
+      <form id="profileForm" class="compact-form"><h4>Criar/ajustar perfil</h4>
+        <div class="form-group"><label for="profileName">Nome do perfil</label><input id="profileName" placeholder="MOTORISTA 1" required></div>
+        <div class="form-group"><label for="profileDescription">Descrição</label><textarea id="profileDescription" rows="3"></textarea></div>
+        <div class="form-grid two"><div class="form-group"><label for="profileVersion">Versão</label><input id="profileVersion" type="number" min="1" value="1"></div><div class="form-group"><label for="profilePublished">Publicado?</label><select id="profilePublished"><option value="false">Não</option><option value="true">Sim</option></select></div></div>
+        <button type="submit">Criar perfil</button>
+      </form>
+      <div><h4>Perfis disponíveis</h4><div id="profileList" class="actor-list"></div></div>
+    </div>
+  </section>
 
-        <p class="message" id="formMessage" hidden></p>
+  <section class="panel">
+    <h3>Criar passaporte para candidato</h3>
+    <form id="passportForm">
+      <div class="form-grid"><div class="form-group"><label for="createdByRh">RH responsável</label><select id="createdByRh" required></select></div><div class="form-group"><label for="passportProfile">Perfil publicado</label><select id="passportProfile" required></select></div><div class="form-group"><label for="jobPosition">Cargo fixo</label><select id="jobPosition" required></select></div></div>
+      <div class="form-grid"><div class="form-group"><label for="candidateName">Nome do candidato</label><input id="candidateName" required></div><div class="form-group"><label for="candidateCpf">CPF</label><input id="candidateCpf" required></div></div>
+      <button type="submit">Gerar passaporte e chave do candidato</button>
+    </form>
+  </section>
 
-        <form id="passportForm">
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="createdByRh">Respons&aacute;vel RH <span class="required-mark">*</span></label>
-                    <select id="createdByRh" required>
-                        <option value="">Carregando usu&aacute;rios...</option>
-                    </select>
-                    <small class="field-hint">O backend exige um usu&aacute;rio ativo com papel RH.</small>
-                </div>
+  <section class="panel">
+    <div class="panel-heading"><h3>Passaportes e workflow</h3><small>Use a chave para o candidato acessar o portal.</small></div>
+    <div class="form-group"><label for="passportSelect">Selecionar passaporte</label><select id="passportSelect"></select></div>
+    <div class="table-wrap"><table><thead><tr><th>Candidato</th><th>CPF</th><th>Cargo</th><th>Chave</th><th>Perfil</th><th>RH</th><th>Status</th></tr></thead><tbody id="passportTableBody"></tbody></table></div>
+  </section>
 
-                <div class="form-group">
-                    <label for="candidateName">Nome do candidato <span class="required-mark">*</span></label>
-                    <input type="text" id="candidateName" required autocomplete="off">
-                </div>
+  <section class="panel">
+    <h3>Manutenção do workflow do passaporte selecionado</h3>
+    <div class="workflow-builder">
+      <form id="activityForm" class="compact-form"><h4>Nova atividade</h4><input id="activityName" placeholder="Nome da atividade" required><input id="activityOrder" type="number" min="1" placeholder="Ordem"><select id="activityRole"><option value="RH">RH</option><option value="CONTRATADO">Contratado</option><option value="MEDICINA_TRABALHO">Medicina</option><option value="GERENTE">Gerente</option></select><button>Adicionar atividade</button></form>
+      <form id="taskForm" class="compact-form"><h4>Nova tarefa</h4><select id="activityForTask" required></select><input id="taskName" placeholder="Nome da tarefa" required><input id="taskDeadline" type="date"><select id="taskRole"><option value="CONTRATADO">Contratado</option><option value="RH">RH</option><option value="MEDICINA_TRABALHO">Medicina</option><option value="GERENTE">Gerente</option></select><button>Adicionar tarefa</button></form>
+      <form id="subtaskForm" class="compact-form"><h4>Nova subtarefa</h4><select id="taskForSubtask" required></select><input id="subtaskName" placeholder="Nome da subtarefa" required><input id="subtaskDeadline" type="date"><select id="subtaskRole"><option value="CONTRATADO">Contratado</option><option value="RH">RH</option><option value="MEDICINA_TRABALHO">Medicina</option><option value="GERENTE">Gerente</option></select><button>Adicionar subtarefa</button></form>
+    </div>
+    <div id="workflowPanel" class="workflow-container"></div>
+  </section>
 
-                <div class="form-group">
-                    <label for="candidateCpf">CPF <span class="required-mark">*</span></label>
-                    <input type="text" id="candidateCpf" required autocomplete="off">
-                </div>
+  <section class="panel">
+    <h3>Categorias de documentos necessárias</h3>
+    <div class="actor-layout"><form id="categoryForm" class="compact-form"><h4>Nova categoria</h4><input id="categoryName" placeholder="CNH" required><input id="categoryDescription" placeholder="Descrição"><input id="categoryPermitType" placeholder="PDF, PNG, JPG" required><button>Criar categoria</button></form><div><h4>Categorias cadastradas</h4><div id="categoryList" class="tag-list"></div></div></div>
+  </section>
 
-                <div class="form-group">
-                    <label for="jobPosition">Cargo pretendido <span class="required-mark">*</span></label>
-                    <input type="text" id="jobPosition" required autocomplete="off">
-                </div>
-            </div>
+  <section class="panel inbox-panel">
+    <div class="panel-heading"><div><h3>Documentos recebidos do candidato</h3><p class="section-note">O candidato envia os documentos ao RH. O RH confere e encaminha para Medicina do Trabalho ou Gerente conforme o fluxo do passaporte.</p></div><span class="flow-pill">Candidato → RH → Medicina/Gerente</span></div>
+    <div id="rhInboxList" class="artifact-list"></div>
+  </section>
 
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="medicalDocuments">Documentos para Medicina <span class="required-mark">*</span></label>
-                    <input type="file" id="medicalDocuments" multiple required>
-                    <small class="field-hint">Apenas a Medicina visualizar&aacute; estes anexos.</small>
-                </div>
-
-                <div class="form-group">
-                    <label for="managerDocuments">Documentos para Gerente <span class="required-mark">*</span></label>
-                    <input type="file" id="managerDocuments" multiple required>
-                    <small class="field-hint">Apenas o Gerente visualizar&aacute; estes anexos.</small>
-                </div>
-            </div>
-
-            <button type="submit"><span class="button-icon">+</span> Criar passaporte</button>
-        </form>
-    </section>
-
-    <section class="panel">
-        <h3>Passaportes cadastrados</h3>
-
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Candidato</th>
-                        <th>CPF</th>
-                        <th>Cargo</th>
-                        <th>Medicina</th>
-                        <th>Gerente</th>
-                        <th>Anexos</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody id="passportTableBody"></tbody>
-            </table>
-        </div>
-    </section>
-
+  <section class="panel">
+    <h3>Vincular artefato a atividade, tarefa ou subtarefa</h3>
+    <form id="artifactForm"><div class="form-grid"><div class="form-group"><label for="artifactTarget">Destino no workflow</label><select id="artifactTarget" required></select></div><div class="form-group"><label for="artifactDocumentName">Documento</label><select id="artifactDocumentName" required></select></div><div class="form-group"><label for="artifactFileType">Tipo do arquivo</label><select id="artifactFileType" required><option value="PDF">PDF</option><option value="PNG">PNG</option><option value="JPG">JPG</option><option value="DOCX">DOCX</option><option value="XLSX">XLSX</option><option value="XML">XML</option></select></div></div><div class="form-grid"><div class="form-group"><label for="artifactFile">Arquivo demonstrativo</label><input id="artifactFile" type="file" required></div><div class="form-group"><label for="artifactDestination">Setor responsável</label><select id="artifactDestination"><option value="RH">RH</option><option value="MEDICINA">Medicina do Trabalho</option><option value="GERENTE">Gerente</option></select></div><div class="form-group"><label for="artifactNotes">Observações</label><input id="artifactNotes" placeholder="Observação sobre o documento"></div></div><button>Vincular artefato</button></form>
+    <div id="artifactList" class="artifact-list"></div>
+  </section>
 </main>
-
-<script src="rh.js"></script>
+<script src="shared.js"></script><script src="rh.js"></script>
 </body>
 </html>

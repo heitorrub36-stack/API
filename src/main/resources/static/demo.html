@@ -1,78 +1,14 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Passaporte - Demo</title>
-    <link rel="stylesheet" href="style.css">
-</head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Sistema Passaporte - Candidato</title><link rel="stylesheet" href="style.css"></head>
 <body>
-
-<header class="topbar">
-    <h1>Sistema Passaporte</h1>
-    <nav>
-        <a href="rh.html">RH</a>
-        <a href="review.html">Medicina/Gerente</a>
-        <a href="dashboard.html">Dashboard</a>
-        <a href="demo.html" class="active">Demo</a>
-    </nav>
-</header>
-
-<main class="container">
-    <section class="page-title">
-        <h2>Demo do sistema</h2>
-        <p>Acesse os fluxos principais e acompanhe os indicadores atuais da API.</p>
-    </section>
-
-    <section class="cards">
-        <div class="card"><span>Total cadastrados</span><strong id="totalPassports">0</strong></div>
-        <div class="card"><span>Pendentes de avalia&ccedil;&atilde;o m&eacute;dica</span><strong id="pendingMedicalEvaluation">0</strong></div>
-        <div class="card"><span>Aptos aguardando gerente</span><strong id="fitWaitingManagerStatus">0</strong></div>
-        <div class="card"><span>Abertos</span><strong id="openPassports">0</strong></div>
-        <div class="card"><span>Validados</span><strong id="validPassports">0</strong></div>
-        <div class="card"><span>Inv&aacute;lidos</span><strong id="invalidPassports">0</strong></div>
-        <div class="card"><span>Cancelados</span><strong id="canceledPassports">0</strong></div>
-    </section>
-
-    <section class="panel">
-        <h3>Fluxos</h3>
-        <div class="artifact-grid">
-            <article class="artifact-card">
-                <div class="artifact-heading">
-                    <span class="artifact-icon pending">RH</span>
-                    <div>
-                        <strong>Cadastro de passaporte</strong>
-                        <span>Crie candidatos, selecione o respons&aacute;vel RH e anexe documentos.</span>
-                    </div>
-                </div>
-                <a class="ghost-button link-button" href="rh.html">Abrir RH</a>
-            </article>
-
-            <article class="artifact-card">
-                <div class="artifact-heading">
-                    <span class="artifact-icon pending">MG</span>
-                    <div>
-                        <strong>Medicina e Gerente</strong>
-                        <span>Avalie documentos, resultado m&eacute;dico, decis&atilde;o gerencial e cancelamento.</span>
-                    </div>
-                </div>
-                <a class="ghost-button link-button" href="review.html">Abrir avalia&ccedil;&otilde;es</a>
-            </article>
-
-            <article class="artifact-card">
-                <div class="artifact-heading">
-                    <span class="artifact-icon pending">DB</span>
-                    <div>
-                        <strong>Dashboard</strong>
-                        <span>Veja os indicadores e a lista consolidada de passaportes.</span>
-                    </div>
-                </div>
-                <a class="ghost-button link-button" href="dashboard.html">Abrir dashboard</a>
-            </article>
-        </div>
-    </section>
-</main>
-
-<script src="demo.js"></script>
-</body>
-</html>
+<header class="topbar"><h1>Sistema Passaporte</h1><nav><a href="demo.html" class="active">Candidato</a><a href="rh.html">RH</a><a href="medical.html">Medicina</a><a href="manager.html">Gerente</a><a href="dashboard.html">Dashboard</a></nav></header>
+<main class="container narrow-container">
+<section class="page-title"><span class="eyebrow">Contratado</span><h2>Acesso por chave única</h2><p>Digite a chave entregue pelo RH para consultar seu passaporte ativo, acompanhar atividades, tarefas e subtarefas e enviar documentos.</p></section>
+<p class="message" id="candidateMessage" hidden></p>
+<section class="panel"><h3>Entrar no passaporte</h3><form id="accessForm" class="inline-form"><input id="accessKey" placeholder="Ex.: 9F3A7B2C" required><button>Acessar</button></form></section>
+<section class="panel"><h3>Meu passaporte</h3><div id="passportDetails" class="details-box"><p>Informe sua chave para visualizar o passaporte.</p></div></section>
+<section class="panel candidate-upload-panel"><div class="panel-heading"><div><h3>Enviar dados e documentos ao RH</h3><p class="section-note">O candidato envia documentos pessoais para o RH. Depois, o RH confere e encaminha para Medicina do Trabalho ou Gerente quando necessário.</p></div><span class="flow-pill">Candidato → RH → Medicina/Gerente</span></div><form id="candidateArtifactForm"><div class="form-grid"><div class="form-group"><label for="artifactTarget">Atividade/Tarefa/Subtarefa</label><select id="artifactTarget" required></select></div><div class="form-group"><label for="documentName">Tipo de documento</label><select id="documentName" required></select></div><div class="form-group"><label for="artifactFileType">Tipo do arquivo</label><select id="artifactFileType" required><option value="PDF">PDF</option><option value="PNG">PNG</option><option value="JPG">JPG</option><option value="DOCX">DOCX</option><option value="XLSX">XLSX</option><option value="XML">XML</option></select></div></div><div class="form-grid"><div class="form-group"><label for="artifactFile">Arquivo</label><input id="artifactFile" type="file" required><small class="field-hint">O arquivo fica no navegador; a API salva os metadados para demonstração.</small></div><div class="form-group"><label for="artifactNotes">Dados/observações</label><input id="artifactNotes" placeholder="Ex.: número da CNH, validade, observação"></div></div><button>Enviar documento para o RH</button></form></section>
+<section class="panel"><h3>Meus documentos</h3><div id="artifactList" class="artifact-list"></div></section>
+<section class="panel"><h3>Andamento</h3><div id="workflowPanel" class="workflow-container"></div></section>
+</main><script src="shared.js"></script><script src="demo.js"></script></body></html>
