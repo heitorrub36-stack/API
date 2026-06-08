@@ -3,7 +3,7 @@ package com.project.passport.api.controller;
 import com.project.passport.api.dto.PassportActivityDto;
 import com.project.passport.api.dto.PassportSubtaskDto;
 import com.project.passport.api.dto.PassportTaskDto;
-import com.project.passport.api.dto.WorkflowStatusDto;
+import com.project.passport.api.dto.ProcessStatusDto;
 import com.project.passport.api.model.Passport;
 import com.project.passport.api.model.PassportActivity;
 import com.project.passport.api.model.PassportSubtask;
@@ -64,17 +64,17 @@ public class WorkflowController {
     }
 
     @PatchMapping("/activities/{id}/status")
-    public PassportActivity updateActivityStatus(@PathVariable UUID id, @RequestBody WorkflowStatusDto dto) {
+    public PassportActivity updateActivityStatus(@PathVariable UUID id, @RequestBody ProcessStatusDto dto) {
         return workflowService.updateActivityStatus(id, dto.getStatus());
     }
 
     @PatchMapping("/tasks/{id}/status")
-    public PassportTask updateTaskStatus(@PathVariable UUID id, @RequestBody WorkflowStatusDto dto) {
+    public PassportTask updateTaskStatus(@PathVariable UUID id, @RequestBody ProcessStatusDto dto) {
         return workflowService.updateTaskStatus(id, dto.getStatus());
     }
 
     @PatchMapping("/subtasks/{id}/status")
-    public PassportSubtask updateSubtaskStatus(@PathVariable UUID id, @RequestBody WorkflowStatusDto dto) {
+    public PassportSubtask updateSubtaskStatus(@PathVariable UUID id, @RequestBody ProcessStatusDto dto) {
         return workflowService.updateSubtaskStatus(id, dto.getStatus());
     }
 }

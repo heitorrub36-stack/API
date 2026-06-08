@@ -3,8 +3,8 @@ package com.project.passport.api.services;
 import com.project.passport.api.dto.PassportActivityDto;
 import com.project.passport.api.dto.PassportSubtaskDto;
 import com.project.passport.api.dto.PassportTaskDto;
+import com.project.passport.api.enums.ProcessStatus;
 import com.project.passport.api.enums.UserRole;
-import com.project.passport.api.enums.WorkflowStatus;
 import com.project.passport.api.model.Passport;
 import com.project.passport.api.model.PassportActivity;
 import com.project.passport.api.model.PassportSubtask;
@@ -140,21 +140,21 @@ public class WorkflowService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subtask not found"));
     }
 
-    public PassportActivity updateActivityStatus(UUID id, WorkflowStatus status) {
+    public PassportActivity updateActivityStatus(UUID id, ProcessStatus status) {
         if (status == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status is required");
         PassportActivity activity = getActivityById(id);
         activity.setStatus(status);
         return activityRepository.save(activity);
     }
 
-    public PassportTask updateTaskStatus(UUID id, WorkflowStatus status) {
+    public PassportTask updateTaskStatus(UUID id, ProcessStatus status) {
         if (status == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status is required");
         PassportTask task = getTaskById(id);
         task.setStatus(status);
         return taskRepository.save(task);
     }
 
-    public PassportSubtask updateSubtaskStatus(UUID id, WorkflowStatus status) {
+    public PassportSubtask updateSubtaskStatus(UUID id, ProcessStatus status) {
         if (status == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status is required");
         PassportSubtask subtask = getSubtaskById(id);
         subtask.setStatus(status);
@@ -174,7 +174,7 @@ public class WorkflowService {
         activity.setDescription(description);
         activity.setOrderNumber(orderNumber != null ? orderNumber : 1);
         activity.setResponsibleRole(responsibleRole);
-        activity.setStatus(WorkflowStatus.ABERTA);
+        activity.setStatus(ProcessStatus.ABERTA);
         return activityRepository.save(activity);
     }
 
@@ -186,7 +186,7 @@ public class WorkflowService {
         task.setOrderNumber(orderNumber != null ? orderNumber : 1);
         task.setDeadline(deadline);
         task.setResponsibleRole(responsibleRole);
-        task.setStatus(WorkflowStatus.ABERTA);
+        task.setStatus(ProcessStatus.ABERTA);
         return taskRepository.save(task);
     }
 
@@ -198,7 +198,7 @@ public class WorkflowService {
         subtask.setOrderNumber(orderNumber != null ? orderNumber : 1);
         subtask.setDeadline(deadline);
         subtask.setResponsibleRole(responsibleRole);
-        subtask.setStatus(WorkflowStatus.ABERTA);
+        subtask.setStatus(ProcessStatus.ABERTA);
         return subtaskRepository.save(subtask);
     }
 
