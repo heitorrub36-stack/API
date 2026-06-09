@@ -8,11 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.project.passport.api.dto.ManagerReviewDto;
-import com.project.passport.api.dto.MedicalReviewDto;
 import com.project.passport.api.dto.PassportDto;
-import com.project.passport.api.enums.ManagerStatus;
-import com.project.passport.api.enums.MedicalStatus;
 import com.project.passport.api.enums.UserRole;
 import com.project.passport.api.enums.WorkflowStatus;
 import com.project.passport.api.model.AppUser;
@@ -57,8 +53,6 @@ public class PassportService {
         passport.setCandidateAccessKey(generateCandidateAccessKey());
         passport.setCreatedAt(LocalDate.now());
         passport.setStatus(WorkflowStatus.ABERTA);
-        passport.setMedicalStatus(MedicalStatus.PENDENTE);
-        passport.setManagerStatus(ManagerStatus.PENDENTE);
 
         if (dto.getCreatedByRh() != null) {
             AppUser rhUser = appUserService.getAppUserById(dto.getCreatedByRh());
@@ -70,7 +64,6 @@ public class PassportService {
         workflowService.generateDefaultWorkflow(savedPassport);
         return savedPassport;
     }
-
 
     public List<Passport> getAllPassports() {
         return passportRepository.findAll();
@@ -89,67 +82,6 @@ public class PassportService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Passport not found for this access key"));
     }
 
-    public Passport updateMedicalReview(UUID id, MedicalReviewDto dto) {
-        if (dto == null || dto.getMedicalStatus() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Medical status is required");
-        }
-
-        Passport passport = getPassportById(id);
-        ensureNotCancelled(passport);
-
-        passport.setMedicalStatus(dto.getMedicalStatus());
-        passport.setMedicalNotes(dto.getMedicalNotes());
-
-        if (dto.getMedicalReviewerId() != null) {
-            AppUser medicalUser = appUserService.getAppUserById(dto.getMedicalReviewerId());
-            validateUserRole(medicalUser, UserRole.MEDICINA_TRABALHO,
-                    "Only Medicina do Trabalho can review medical status");
-            passport.setMedicalReviewer(medicalUser);
-        }
-
-        updateStatus(passport);
-
-        return passportRepository.save(passport);
-    }
-
-    public Passport updateManagerReview(UUID id, ManagerReviewDto dto) {
-        if (dto == null || dto.getManagerStatus() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Manager status is required");
-        }
-
-        Passport passport = getPassportById(id);
-        ensureNotCancelled(passport);
-
-        passport.setManagerStatus(dto.getManagerStatus());
-        passport.setManagerNotes(dto.getManagerNotes());
-
-        if (dto.getManagerReviewerId() != null) {
-            AppUser managerUser = appUserService.getAppUserById(dto.getManagerReviewerId());
-            validateUserRole(managerUser, UserRole.GERENTE, "Only Gerente can review manager status");
-            passport.setManagerReviewer(managerUser);
-        }
-
-        updateStatus(passport);
-
-        return passportRepository.save(passport);
-    }
-
-    private void updateStatus(Passport passport) {
-        if (passport.getStatus() == WorkflowStatus.CANCELADA) {
-            return;
-        }
-
-        if (passport.getMedicalStatus() == MedicalStatus.INAPTO
-                || passport.getManagerStatus() == ManagerStatus.REPROVADO) {
-            passport.setStatus(WorkflowStatus.INVALIDA);
-        } else if (passport.getMedicalStatus() == MedicalStatus.APTO
-                && passport.getManagerStatus() == ManagerStatus.APROVADO) {
-            passport.setStatus(WorkflowStatus.VALIDA);
-        } else {
-            passport.setStatus(WorkflowStatus.ABERTA);
-        }
-    }
-
     public Passport cancelPassport(UUID id) {
         Passport passport = getPassportById(id);
         passport.setStatus(WorkflowStatus.CANCELADA);
@@ -160,8 +92,6 @@ public class PassportService {
         Passport passport = getPassportById(id);
         passportRepository.delete(passport);
     }
-
-
 
     private String generateCandidateAccessKey() {
         String key;
@@ -184,20 +114,13 @@ public class PassportService {
         if (isBlank(dto.getJobPosition())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Job position is required");
         }
-
-        if(dto.getCreatedByRh() == null){
+        if (dto.getCreatedByRh() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "RH user is required");
         }
     }
 
     private boolean isBlank(String value) {
         return value == null || value.isBlank();
-    }
-
-    private void ensureNotCancelled(Passport passport) {
-        if (passport.getStatus() == WorkflowStatus.CANCELADA) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Cancelled passport cannot be reviewed");
-        }
     }
 
     private void validateUserRole(AppUser user, UserRole expectedRole, String message) {

@@ -230,7 +230,7 @@ async function createArtifact(event) {
     const artifact = await api("/artifacts", { method: "POST", body: JSON.stringify(payload) });
     await saveArtifactFile(artifact.id, file);
     event.target.reset();
-    showMessage("rhMessage", "Artefato vinculado ao workflow.", "success");
+    showMessage("rhMessage", "Artefato vinculado às etapas.", "success");
     await refreshSelectedPassportData();
   } catch (error) { showMessage("rhMessage", error.message, "error"); }
 }
@@ -268,7 +268,7 @@ async function selectPassport(event) {
 
 async function refreshSelectedPassportData() {
   if (!selectedPassport) {
-    workflowPanel.innerHTML = `<p class="empty-cell">Selecione um passaporte para ver o workflow.</p>`;
+    workflowPanel.innerHTML = `<p class="empty-cell">Selecione um passaporte para ver as etapas.</p>`;
     artifactTarget.innerHTML = `<option value="">Selecione um passaporte primeiro</option>`;
     activityForTask.innerHTML = `<option value="">Selecione um passaporte primeiro</option>`;
     taskForSubtask.innerHTML = `<option value="">Selecione uma tarefa primeiro</option>`;

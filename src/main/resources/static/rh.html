@@ -9,11 +9,11 @@
 <body>
 <header class="topbar">
   <h1>Sistema Passaporte</h1>
-  <nav><a href="demo.html">Cadastro</a><a href="rh.html" class="active">RH</a><a href="medical.html">Medicina</a><a href="manager.html">Gerente</a><a href="dashboard.html">Dashboard</a></nav>
+  <nav><a href="demo.html">Candidato</a><a href="rh.html" class="active">RH</a></nav>
 </header>
 <main class="container">
   <section class="page-title split-title">
-    <div><span class="eyebrow">Responsável do RH</span><h2>Perfis, passaportes e workflow</h2><p>Crie perfis por categoria profissional, publique, gere passaportes, mantenha atividades/tarefas/subtarefas e acompanhe documentos.</p></div>
+    <div><span class="eyebrow">Responsável do RH</span><h2>Perfis, passaportes e fluxo de etapas</h2><p>Crie perfis por categoria profissional, publique, gere passaportes, mantenha atividades/tarefas/subtarefas e acompanhe documentos.</p></div>
     <button id="refreshButton" type="button">Atualizar</button>
   </section>
   <p class="message" id="rhMessage" hidden></p>
@@ -62,13 +62,13 @@
   </section>
 
   <section class="panel">
-    <div class="panel-heading"><h3>Passaportes e workflow</h3><small>Use a chave para o candidato acessar o portal.</small></div>
+    <div class="panel-heading"><h3>Passaportes e fluxo de etapas</h3><small>Use a chave para o candidato acessar o portal.</small></div>
     <div class="form-group"><label for="passportSelect">Selecionar passaporte</label><select id="passportSelect"></select></div>
     <div class="table-wrap"><table><thead><tr><th>Candidato</th><th>CPF</th><th>Cargo</th><th>Chave</th><th>Perfil</th><th>RH</th><th>Status</th></tr></thead><tbody id="passportTableBody"></tbody></table></div>
   </section>
 
   <section class="panel">
-    <h3>Manutenção do workflow do passaporte selecionado</h3>
+    <h3>Manutenção das etapas do passaporte selecionado</h3>
     <div class="workflow-builder">
       <form id="activityForm" class="compact-form"><h4>Nova atividade</h4><input id="activityName" placeholder="Nome da atividade" required><input id="activityOrder" type="number" min="1" placeholder="Ordem"><select id="activityRole"><option value="RH">RH</option><option value="CONTRATADO">Contratado</option><option value="MEDICINA_TRABALHO">Medicina</option><option value="GERENTE">Gerente</option></select><button>Adicionar atividade</button></form>
       <form id="taskForm" class="compact-form"><h4>Nova tarefa</h4><select id="activityForTask" required></select><input id="taskName" placeholder="Nome da tarefa" required><input id="taskDeadline" type="date"><select id="taskRole"><option value="CONTRATADO">Contratado</option><option value="RH">RH</option><option value="MEDICINA_TRABALHO">Medicina</option><option value="GERENTE">Gerente</option></select><button>Adicionar tarefa</button></form>
@@ -89,7 +89,7 @@
 
   <section class="panel">
     <h3>Vincular artefato a atividade, tarefa ou subtarefa</h3>
-    <form id="artifactForm"><div class="form-grid"><div class="form-group"><label for="artifactTarget">Destino no workflow</label><select id="artifactTarget" required></select></div><div class="form-group"><label for="artifactDocumentName">Documento</label><select id="artifactDocumentName" required></select></div><div class="form-group"><label for="artifactFileType">Tipo do arquivo</label><select id="artifactFileType" required><option value="PDF">PDF</option><option value="PNG">PNG</option><option value="JPG">JPG</option><option value="DOCX">DOCX</option><option value="XLSX">XLSX</option><option value="XML">XML</option></select></div></div><div class="form-grid"><div class="form-group"><label for="artifactFile">Arquivo demonstrativo</label><input id="artifactFile" type="file" required></div><div class="form-group"><label for="artifactDestination">Setor responsável</label><select id="artifactDestination"><option value="RH">RH</option><option value="MEDICINA">Medicina do Trabalho</option><option value="GERENTE">Gerente</option></select></div><div class="form-group"><label for="artifactNotes">Observações</label><input id="artifactNotes" placeholder="Observação sobre o documento"></div></div><button>Vincular artefato</button></form>
+    <form id="artifactForm"><div class="form-grid"><div class="form-group"><label for="artifactTarget">Destino nas etapas</label><select id="artifactTarget" required></select></div><div class="form-group"><label for="artifactDocumentName">Documento</label><select id="artifactDocumentName" required></select></div><div class="form-group"><label for="artifactFileType">Tipo do arquivo</label><select id="artifactFileType" required><option value="PDF">PDF</option><option value="PNG">PNG</option><option value="JPG">JPG</option><option value="DOCX">DOCX</option><option value="XLSX">XLSX</option><option value="XML">XML</option></select></div></div><div class="form-grid"><div class="form-group"><label for="artifactFile">Arquivo demonstrativo</label><input id="artifactFile" type="file" required></div><div class="form-group"><label for="artifactDestination">Setor responsável</label><select id="artifactDestination"><option value="RH">RH</option><option value="MEDICINA">Medicina do Trabalho</option><option value="GERENTE">Gerente</option></select></div><div class="form-group"><label for="artifactNotes">Observações</label><input id="artifactNotes" placeholder="Observação sobre o documento"></div></div><button>Vincular artefato</button></form>
     <div id="artifactList" class="artifact-list"></div>
   </section>
 </main>

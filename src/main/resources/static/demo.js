@@ -42,7 +42,7 @@ async function refreshSelectedData() {
 }
 
 function renderDetails() {
-  passportDetails.innerHTML = `<div class="detail-grid"><p><strong>Candidato:</strong> ${escapeHtml(selectedPassport.candidateName)}</p><p><strong>CPF:</strong> ${escapeHtml(selectedPassport.candidateCpf)}</p><p><strong>Cargo:</strong> ${escapeHtml(selectedPassport.jobPosition)}</p><p><strong>Perfil:</strong> ${escapeHtml(profileName(selectedPassport))}</p><p><strong>Chave:</strong> <code>${escapeHtml(accessKeyLabel(selectedPassport))}</code></p><p><strong>Status:</strong> ${statusBadge(selectedPassport.status)}</p><p><strong>Medicina:</strong> ${escapeHtml(selectedPassport.medicalStatus || "-")}</p><p><strong>Gerente:</strong> ${escapeHtml(selectedPassport.managerStatus || "-")}</p></div>`;
+  passportDetails.innerHTML = `<div class="detail-grid"><p><strong>Candidato:</strong> ${escapeHtml(selectedPassport.candidateName)}</p><p><strong>CPF:</strong> ${escapeHtml(selectedPassport.candidateCpf)}</p><p><strong>Cargo:</strong> ${escapeHtml(selectedPassport.jobPosition)}</p><p><strong>Perfil:</strong> ${escapeHtml(profileName(selectedPassport))}</p><p><strong>Chave:</strong> <code>${escapeHtml(accessKeyLabel(selectedPassport))}</code></p><p><strong>Status:</strong> ${statusBadge(selectedPassport.status)}</p></div>`;
 }
 
 function renderWorkflow() { workflowPanel.innerHTML = renderWorkflowTree(workflow, { mutable: false }); }

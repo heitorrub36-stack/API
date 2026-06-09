@@ -106,7 +106,6 @@ function accessKeyLabel(passport) {
 async function loadUsers() { return api("/users"); }
 async function loadProfiles() { return api("/passport-profiles"); }
 async function loadPassports() { return api("/passports"); }
-async function loadDashboard() { return api("/dashboard"); }
 async function loadCategories() { return api("/document-categories"); }
 async function loadPassportByAccessKey(key) { return api(`/passports/access/${encodeURIComponent(key.trim().toUpperCase())}`); }
 

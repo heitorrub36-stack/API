@@ -1,7 +1,5 @@
 package com.project.passport.api.model;
 
-import com.project.passport.api.enums.ManagerStatus;
-import com.project.passport.api.enums.MedicalStatus;
 import com.project.passport.api.enums.WorkflowStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -48,18 +46,6 @@ public class Passport {
     @Column(nullable = false)
     private WorkflowStatus status;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private MedicalStatus medicalStatus;
-
-    private String medicalNotes;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private ManagerStatus managerStatus;
-
-    private String managerNotes;
-
     @ManyToOne
     @JoinColumn(name = "profile_id")
     private PassportProfile profile;
@@ -67,14 +53,6 @@ public class Passport {
     @ManyToOne
     @JoinColumn(name = "created_by_rh_id")
     private AppUser createdByRh;
-
-    @ManyToOne
-    @JoinColumn(name = "medical_reviewer_id")
-    private AppUser medicalReviewer;
-
-    @ManyToOne
-    @JoinColumn(name = "manager_reviewer_id")
-    private AppUser managerReviewer;
 
     public Passport() {
     }
@@ -95,20 +73,8 @@ public class Passport {
     public void setCreatedAt(LocalDate createdAt) { this.createdAt = createdAt; }
     public WorkflowStatus getStatus() { return status; }
     public void setStatus(WorkflowStatus status) { this.status = status; }
-    public MedicalStatus getMedicalStatus() { return medicalStatus; }
-    public void setMedicalStatus(MedicalStatus medicalStatus) { this.medicalStatus = medicalStatus; }
-    public String getMedicalNotes() { return medicalNotes; }
-    public void setMedicalNotes(String medicalNotes) { this.medicalNotes = medicalNotes; }
-    public ManagerStatus getManagerStatus() { return managerStatus; }
-    public void setManagerStatus(ManagerStatus managerStatus) { this.managerStatus = managerStatus; }
-    public String getManagerNotes() { return managerNotes; }
-    public void setManagerNotes(String managerNotes) { this.managerNotes = managerNotes; }
     public PassportProfile getProfile() { return profile; }
     public void setProfile(PassportProfile profile) { this.profile = profile; }
     public AppUser getCreatedByRh() { return createdByRh; }
     public void setCreatedByRh(AppUser createdByRh) { this.createdByRh = createdByRh; }
-    public AppUser getMedicalReviewer() { return medicalReviewer; }
-    public void setMedicalReviewer(AppUser medicalReviewer) { this.medicalReviewer = medicalReviewer; }
-    public AppUser getManagerReviewer() { return managerReviewer; }
-    public void setManagerReviewer(AppUser managerReviewer) { this.managerReviewer = managerReviewer; }
 }

@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.project.passport.api.dto.ManagerReviewDto;
-import com.project.passport.api.dto.MedicalReviewDto;
 import com.project.passport.api.dto.PassportDto;
 import com.project.passport.api.model.Passport;
 import com.project.passport.api.services.PassportService;
@@ -49,16 +47,6 @@ public class PassportController {
         return passportService.createPassport(dto);
     }
 
-    @PatchMapping("/{id}/medical-review")
-    public Passport updateMedicalReview(@PathVariable UUID id, @RequestBody MedicalReviewDto dto) {
-        return passportService.updateMedicalReview(id, dto);
-    }
-
-    @PatchMapping("/{id}/manager-review")
-    public Passport updateManagerReview(@PathVariable UUID id, @RequestBody ManagerReviewDto dto) {
-        return passportService.updateManagerReview(id, dto);
-    }
-
     @PatchMapping("/{id}/cancel")
     public Passport cancelPassport(@PathVariable UUID id) {
         return passportService.cancelPassport(id);
@@ -70,4 +58,3 @@ public class PassportController {
         return ResponseEntity.noContent().build();
     }
 }
-
