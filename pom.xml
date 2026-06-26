@@ -87,21 +87,7 @@
 				<artifactId>graphqlcodegen-maven-plugin</artifactId>
 				<version>1.61.5</version>
 				<executions>
-					<execution>
-						<?m2e execute onConfiguration?>
-						<id>dgs-codegen</id>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-						<configuration>
-							<schemaPaths>
-								<param>src/main/resources/graphql-client</param>
-							</schemaPaths>
-							<packageName>com.project.passport.api.codegen</packageName>
-							<addGeneratedAnnotation>true</addGeneratedAnnotation>
-							<disableDatesInGeneratedAnnotation>true</disableDatesInGeneratedAnnotation>
-						</configuration>
-					</execution>
+					
 				</executions>
 			</plugin>
 			<plugin>
